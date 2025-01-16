@@ -27,15 +27,15 @@ export default function ContentManagement() {
   return (
     <div className="prose max-w-none h-full w-fit px-12 py-8 flex flex-col">
       <h2>Content Management</h2>
-      <div className="w-8/12">
+      <div className="w-12/12">
         <div className="px-4 pl-0 inline-block h-fit w-full rounded-lg font-bold">
-          <div className="flex flex-row w-full rounded-sm pl-0 py-4 items-center gap-2">
+          <div className="flex flex-row w-fit pr-4 rounded-sm pl-0 py-4 items-center gap-2">
             <div className="w-fit">
               <Checkbox />
             </div>
             <div className="w-96 text-left">Title</div>
             <div className="w-40 text-center">Date</div>
-            <div className="w-40 text-center">Status</div>
+            <div className="w-20 text-right">Status</div>
           </div>
         </div>
         <div className="">
