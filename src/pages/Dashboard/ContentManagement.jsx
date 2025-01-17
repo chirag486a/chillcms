@@ -45,18 +45,20 @@ export default function ContentManagement() {
           </div>
         </div>
       </div>
-      <div className="w-12/12">
-        <div className="pr-4 bg-base-300 pl-0 inline-block h-fit w-full rounded-none font-bold">
-          <div className="flex flex-row w-full rounded-sm pl-0 justify-between items-center gap-2">
-            <div className="w-fit">
-              <Checkbox />
+      <div className="w-fit flex flex-col">
+        <div className="pr-4 bg-base-300 pl-0 inline-block h-fit w-fit rounded-none font-bold">
+          <div className="flex flex-row w-fit rounded-sm pl-0 justify-between items-center gap-36">
+            <div className="flex items-center gap-4">
+              <div className="w-fit">
+                <Checkbox />
+              </div>
+              <div className="w-96 text-left">Title</div>
             </div>
-            <div className="w-96 text-left">Title</div>
             <div className="w-40 text-center">Date</div>
             <div className="w-20 text-right">Status</div>
           </div>
         </div>
-        <div className="w-full">
+        <div className="max-w-min">
           <ContentManagementTC content={contents[0]} />
           <ContentManagementTC content={contents[1]} />
           <ContentManagementTC content={contents[2]} />
