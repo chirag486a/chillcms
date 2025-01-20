@@ -1,7 +1,13 @@
 import { Outlet } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+
 import SettingIcon from "../assets/icons/setting-icon.svg?react";
-import NavBar from "../components/NavBar";
-import TopPanal from "../components/TopPanal";
+import NavBar from "./Components/NavBar";
+
+import Home from "./Dashboard/Home";
+import ContentManagement from "./Dashboard/ContentManagement";
+import UserManagement from "./Dashboard/UserManagement";
+import Todos from "./Dashboard/Todos";
 
 export default function Dashboard() {
   return (
@@ -20,12 +26,16 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-
         <div>
-          <TopPanal />
-        </div>
-        <div>
-          <Outlet />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="content-management" element={<ContentManagement />} />
+            <Route path="user-management" element={<UserManagement />} />
+            <Route path="todos" element={<Todos />} />
+          </Routes>
+          <div>
+            <Outlet />
+          </div>
         </div>
       </div>
     </div>

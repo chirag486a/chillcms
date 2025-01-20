@@ -1,12 +1,13 @@
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import Checkbox from "@mui/material/Checkbox";
+import TodoTC from "./Components/Todos/TodosTC";
 
 export default function Todos() {
   return (
     <div className="prose max-w-none h-full w-full px-12 py-8 flex flex-col">
       <div className="flex justify-between items-baseline">
         <div>
-          <h2 className="mt-0 w-fit">Content Management</h2>
+          <h2 className="mt-0 w-fit">Todos</h2>
         </div>
         <div className="flex items-center gap-4">
           <span>1-10 of 203</span>
@@ -35,6 +36,15 @@ export default function Todos() {
           </div>
         </div>
         <div className="w-full">
+          <TodoTC />
+          <TodoTC />
+          <TodoTC />
+          <TodoTC />
+          <TodoTC />
+          <TodoTC />
+          <TodoTC />
+          <TodoTC />
+          <TodoTC />
         </div>
       </div>
     </div>
