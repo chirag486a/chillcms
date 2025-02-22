@@ -29,6 +29,9 @@ namespace Backend.Controllers
                 return BadRequest(ModelState);
             }
             var NewUser = signup.ToAppUserFromSignupDto();
+
+            // Done to remove editor warning...
+            if (NewUser.Email == null) return BadRequest("Email is invalid");
             var ifExists = await _userManager.FindByEmailAsync(NewUser.Email);
             if (ifExists != null)
             {
