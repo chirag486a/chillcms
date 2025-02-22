@@ -8,6 +8,6 @@ namespace Backend.Models
 {
     public class AppUser : IdentityUser
     {
-        public int Name { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }
