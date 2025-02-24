@@ -29,8 +29,8 @@ namespace Backend.Controllers
             _signInManager = signInManager;
         }
 
-        [HttpPost("signup")]
-        public async Task<IActionResult> Signup([FromBody] SignupDto signup)
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] CreateUserDto createUser)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace Backend.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                var NewUser = signup.ToAppUserFromSignupDto();
+                var NewUser = createUser.ToAppUserFromSignupDto();
 
                 // Done to remove editor warning...
                 if (NewUser.Email == null) return BadRequest("Email is invalid");
@@ -49,7 +49,7 @@ namespace Backend.Controllers
                     return BadRequest("User Already Exist");
                 }
 
-                var result = await _userManager.CreateAsync(NewUser, signup.Password);
+                var result = await _userManager.CreateAsync(NewUser, createUser.Password);
 
                 if (result.Succeeded)
                 {

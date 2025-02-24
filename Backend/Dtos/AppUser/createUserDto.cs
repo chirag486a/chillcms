@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Backend.Dtos.AppUser
 {
-    public class SignupDto
+    public class CreateUserDto
     {
         [Required]
         public string UserName { get; set; } = string.Empty;

@@ -9,13 +9,13 @@ namespace Backend.Mappers
 {
     public static class AppUserMappers
     {
-        public static AppUser ToAppUserFromSignupDto(this SignupDto signupDto)
+        public static AppUser ToAppUserFromSignupDto(this CreateUserDto createUserDto)
         {
             return new AppUser
             {
-                UserName = signupDto.UserName,
-                Name = signupDto.Name,
-                Email = signupDto.Email,
+                UserName = createUserDto.UserName,
+                Name = createUserDto.Name,
+                Email = createUserDto.Email,
             };
         }
     }
