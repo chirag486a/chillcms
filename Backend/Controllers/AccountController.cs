@@ -46,7 +46,17 @@ namespace Backend.Controllers
                 var ifExists = await _userManager.FindByEmailAsync(NewUser.Email);
                 if (ifExists != null)
                 {
-                    return BadRequest("User Already Exist");
+                    var errResponse = new
+                    {
+                        status = "fail",
+                        errors = new[] {
+                            new {
+                                code = "UserAlreadyExits",
+                                description = "Email with the user already exits"
+                            }
+                        }
+                    };
+                    return BadRequest(errResponse);
                 }
 
                 var result = await _userManager.CreateAsync(NewUser, createUser.Password);
@@ -79,6 +89,7 @@ namespace Backend.Controllers
                 {
                     var errorResponse = new
                     {
+                        status = "fail",
                         message = "Could not find user"
                     };
                     return NotFound(errorResponse);
@@ -90,6 +101,7 @@ namespace Backend.Controllers
                 {
                     var errorResponse = new
                     {
+                        status = "fail",
                         message = "Username not found or Incorrect Password"
                     };
 
@@ -109,15 +121,15 @@ namespace Backend.Controllers
                 Console.WriteLine(err);
                 var errResponse = new
                 {
+                    status = "fail",
                     message = "Something went wrong"
                 };
                 return BadRequest(errResponse);
             }
         }
 
-        [Authorize]
         [HttpPatch("changePassword")]
-        public async Task<IActionResult> ChangePassword([FromBody] PasswordDto passwordDto)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto passwordDto)
         {
             try
             {
@@ -126,24 +138,34 @@ namespace Backend.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var email = User.GetEmail();
+                var email = passwordDto.Email;
 
                 var user = await _userManager.FindByEmailAsync(email);
                 if (user == null)
                 {
                     var errorResponse = new
                     {
-                        message = "User not logged in."
+                        status = "fail",
+                        errors = new
+                        {
+                            code = "UserNotFound",
+                            description = "User not found"
+                        }
                     };
                     return Unauthorized(errorResponse);
                 }
 
 
-                var result = await _userManager.ChangePasswordAsync(user, passwordDto.OldPassword, passwordDto.OldPassword);
+                var result = await _userManager.ChangePasswordAsync(user, passwordDto.OldPassword, passwordDto.NewPassword);
 
                 if (!result.Succeeded)
                 {
-                    return Ok(result.Errors);
+                    var errorResponse = new
+                    {
+                        status = "fail",
+                        result.Errors
+                    };
+                    return Unauthorized(errorResponse);
                 }
 
                 var response = new
@@ -158,6 +180,7 @@ namespace Backend.Controllers
                 Console.WriteLine(err);
                 return BadRequest(new
                 {
+                    status = "fail",
                     message = "Something went wrong"
                 });
             }
