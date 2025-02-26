@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Azure.Identity;
 using Backend.Interfaces.IServices;
 using Backend.Models;
+using Backend.Models.Users;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.IdentityModel.Tokens;
 
@@ -20,7 +21,7 @@ namespace Backend.Services
         {
             _configuration = configuration;
         }
-        public string GenerateToken(AppUser appUser)
+        public string GenerateToken(User user)
         {
             var jwtSettings = _configuration.GetSection("JWT");
             var keyString = jwtSettings["Key"];
@@ -38,8 +39,9 @@ namespace Backend.Services
 
             var Claims = new ClaimsIdentity(
                 [
-                    new Claim(JwtRegisteredClaimNames.GivenName, appUser.Name),
-                    new Claim(JwtRegisteredClaimNames.Email, appUser.Email)
+                    new Claim(JwtRegisteredClaimNames.GivenName, user.Name),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id)
                 ]
             );
 

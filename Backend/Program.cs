@@ -3,6 +3,7 @@ using Backend.Data;
 using Backend.Helpers;
 using Backend.Interfaces.IServices;
 using Backend.Models;
+using Backend.Models.Users;
 using Backend.Services;
 using BCrypt.Net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,14 +22,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Configure EF Core with SQL Server
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<AppUser, IdentityRole>()
+builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddControllers();
 
 
-builder.Services.AddScoped<IPasswordHasher<AppUser>, BCryptPasswordHasher>();
+builder.Services.AddScoped<IPasswordHasher<User>, BCryptPasswordHasher>();
 
 // Load Jwt from appsettings.json
 var jwtSettings = builder.Configuration.GetSection("JWT");

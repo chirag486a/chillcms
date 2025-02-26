@@ -16,5 +16,9 @@ namespace Backend.Extensions
         {
             return user.Claims.SingleOrDefault(x => x.Type.Equals(ClaimTypes.Email)).Value;
         }
+        public static string GetId(this ClaimsPrincipal user)
+        {
+            return user.Claims.SingleOrDefault(x => x.Type.Equals(ClaimTypes.NameIdentifier)).Value;
+        }
     }
 }

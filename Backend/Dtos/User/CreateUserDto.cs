@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Backend.Dtos.AppUser
+namespace Backend.Dtos.User
 {
     public class CreateUserDto
     {

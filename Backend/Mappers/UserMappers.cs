@@ -2,16 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Backend.Dtos.AppUser;
+using Backend.Dtos.User;
 using Backend.Models;
+using Backend.Models.Users;
 
 namespace Backend.Mappers
 {
     public static class AppUserMappers
     {
-        public static AppUser ToAppUserFromSignupDto(this CreateUserDto createUserDto)
+        public static User ToAppUserFromSignupDto(this CreateUserDto createUserDto)
         {
-            return new AppUser
+            return new User
             {
                 UserName = createUserDto.UserName,
                 Name = createUserDto.Name,

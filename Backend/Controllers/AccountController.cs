@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Backend.Data;
-using Backend.Dtos.AppUser;
+using Backend.Dtos.User;
 using Backend.Extensions;
 using Backend.Interfaces.IServices;
 using Backend.Mappers;
 using Backend.Models;
+using Backend.Models.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -19,10 +20,10 @@ namespace Backend.Controllers
     [Route("api/accounts")]
     public class AccountController : ControllerBase
     {
-        UserManager<AppUser> _userManager;
+        UserManager<User> _userManager;
         ITokenService _tokenService;
-        SignInManager<AppUser> _signInManager;
-        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService, SignInManager<AppUser> signInManager)
+        SignInManager<User> _signInManager;
+        public AccountController(UserManager<User> userManager, ITokenService tokenService, SignInManager<User> signInManager)
         {
             _userManager = userManager;
             _tokenService = tokenService;
@@ -81,7 +82,7 @@ namespace Backend.Controllers
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
-                AppUser? loginUser = null;
+                User? loginUser = null;
                 if (!string.IsNullOrWhiteSpace(loginDto.Email))
                     loginUser = await _userManager.FindByEmailAsync(loginDto.Email);
 

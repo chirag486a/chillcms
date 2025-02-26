@@ -1,12 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Backend.Data;
 using Backend.Dtos.Content;
+using Backend.Extensions;
+using Backend.Mappers;
+using Backend.Models.Contents;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Controllers
 {
@@ -22,7 +21,7 @@ namespace Backend.Controllers
 
         [HttpPost]
         [Authorize]
-        public IActionResult Create([FromBody] ContentMetaCreateDto content)
+        public async Task<IActionResult> Create([FromBody] ContentMetaCreateDto content)
         {
             if (!ModelState.IsValid)
             {
@@ -32,7 +31,12 @@ namespace Backend.Controllers
                     errors = ModelState
                 });
             }
-            return Ok();
+            ContentMeta newContent = content.ToContentMetaFromContentMetaCreateDto();
+            newContent.UserId = User.GetId();
+
+            await _context.ContentMetas.AddAsync(newContent);
+            await _context.SaveChangesAsync();
+            return Ok(new { status = "success", message = "Content created successfully" });
         }
     }
 }

@@ -8,18 +8,20 @@ namespace Backend.Dtos.Content
 {
     public class ContentMetaCreateDto
     {
-        public int Id { get; set; }
-        public string? AppUserId { get; set; }
+        [Required]
+        [MinLength(10, ErrorMessage = "Content title cannot be less than 10 characters")]
+        [MaxLength(1024, ErrorMessage = "Content title cannot be more than 1024 characters")]
+        public string? ContentTitle { get; set; }
 
         [Required]
-        public string ContentTitle { get; set; }
+        [MinLength(10, ErrorMessage = "Content content slug cannot be less than 10 characters")]
+        [MaxLength(1024, ErrorMessage = "Content content slug cannot be more than 1024 characters")]
+        public string? ContentSlug { get; set; }
 
         [Required]
-        public string ContentSlug { get; set; }
+        [MinLength(10, ErrorMessage = "Content description cannot be less than 10 characters")]
+        [MaxLength(1024, ErrorMessage = "Content description cannot be more than 1024 characters")]
+        public string? ContentDescription { get; set; }
 
-        [Required]
-        public string ContentDescription { get; set; }
-
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
