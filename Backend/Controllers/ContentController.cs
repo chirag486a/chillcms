@@ -19,7 +19,7 @@ namespace Backend.Controllers
             _context = context;
         }
 
-        [HttpPost]
+        [HttpPost("meta")]
         [Authorize]
         public async Task<IActionResult> CreateContentMeta([FromBody] ContentMetaCreateDto content)
         {
@@ -37,6 +37,19 @@ namespace Backend.Controllers
             await _context.ContentMetas.AddAsync(newContent);
             await _context.SaveChangesAsync();
             return Ok(new { status = "success", message = "Content Meta created successfully" });
+        }
+        [HttpGet("meta")]
+        public async Task<IActionResult> GetAllContentMeta()
+        {
+            var contents = await _context.ContentMetas.ToListAsync();
+            return Ok(contents);
+        }
+        [HttpPost("file")]
+        [Authorize]
+        public async Task<IActionResult> UploadContentFile([FromForm] ContentFileCreateDto content)
+        {
+            Console.WriteLine(content.Filename);
+            return Ok();
         }
     }
 }
