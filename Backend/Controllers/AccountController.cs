@@ -40,7 +40,7 @@ namespace Backend.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                var NewUser = createUser.ToAppUserFromSignupDto();
+                var NewUser = createUser.ToUserFromSignupDto();
 
                 // Done to remove editor warning...
                 if (NewUser.Email == null) return BadRequest("Email is invalid");

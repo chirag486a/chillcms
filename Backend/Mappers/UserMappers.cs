@@ -8,9 +8,9 @@ using Backend.Models.Users;
 
 namespace Backend.Mappers
 {
-    public static class AppUserMappers
+    public static class UserMappers
     {
-        public static User ToAppUserFromSignupDto(this CreateUserDto createUserDto)
+        public static User ToUserFromSignupDto(this CreateUserDto createUserDto)
         {
             return new User
             {

@@ -21,7 +21,7 @@ namespace Backend.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Create([FromBody] ContentMetaCreateDto content)
+        public async Task<IActionResult> CreateContentMeta([FromBody] ContentMetaCreateDto content)
         {
             if (!ModelState.IsValid)
             {
@@ -36,7 +36,7 @@ namespace Backend.Controllers
 
             await _context.ContentMetas.AddAsync(newContent);
             await _context.SaveChangesAsync();
-            return Ok(new { status = "success", message = "Content created successfully" });
+            return Ok(new { status = "success", message = "Content Meta created successfully" });
         }
     }
 }
