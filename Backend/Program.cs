@@ -73,6 +73,10 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.Configure<FileUploadSettings>(
+    builder.Configuration.GetSection("FileUploadSettings")
+);
+
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 

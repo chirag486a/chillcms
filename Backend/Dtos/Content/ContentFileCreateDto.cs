@@ -15,7 +15,7 @@ namespace Backend.Dtos.Content
         public int ContentId { get; set; }
 
         [Required]
-        public string Filename { get; set; } = string.Empty;
+        public string FileType { get; set; } = string.Empty;
 
         public string Description { get; set; } = string.Empty;
     }
