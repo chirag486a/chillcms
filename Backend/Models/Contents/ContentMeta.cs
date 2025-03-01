@@ -6,7 +6,7 @@ namespace Backend.Models.Contents;
 
 public class ContentMeta
 {
-  public int Id { get; set; }
+  public string Id { get; set; } = Guid.NewGuid().ToString();
   public string UserId { get; set; } = string.Empty;
   public User? User { get; set; }
   public string? ContentTitle { get; set; }

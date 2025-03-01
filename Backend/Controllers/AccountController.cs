@@ -23,11 +23,13 @@ namespace Backend.Controllers
         UserManager<User> _userManager;
         ITokenService _tokenService;
         SignInManager<User> _signInManager;
-        public AccountController(UserManager<User> userManager, ITokenService tokenService, SignInManager<User> signInManager)
+        IFileService _fileService;
+        public AccountController(UserManager<User> userManager, ITokenService tokenService, SignInManager<User> signInManager, IFileService fileService)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _signInManager = signInManager;
+            _fileService = fileService;
         }
 
         [HttpPost("register")]
@@ -60,13 +62,16 @@ namespace Backend.Controllers
                     return BadRequest(errResponse);
                 }
 
+
                 var result = await _userManager.CreateAsync(NewUser, createUser.Password);
 
-                if (result.Succeeded)
+                if (!result.Succeeded)
                 {
-                    return Ok(NewUser);
+                    return Ok("Something went wrong");
                 }
-                return Ok("Something went wrong");
+                await _fileService.CreateUserDirectoryAsync(NewUser);
+                
+                return Ok(NewUser);
             }
             catch (Exception err)
             {

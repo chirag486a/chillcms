@@ -24,11 +24,8 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Contents.ContentMeta", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("ContentDeleted")
                         .HasColumnType("bit");

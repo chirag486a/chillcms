@@ -79,6 +79,7 @@ builder.Services.Configure<FileUploadSettings>(
 
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IFileService, FileService>();
 
 
 var app = builder.Build();

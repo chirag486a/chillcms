@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class ReLayoutModels : Migration
+    public partial class RestartDatabaseFromBeginning : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -161,8 +161,7 @@ namespace Backend.Migrations
                 name: "ContentMetas",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ContentTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ContentSlug = table.Column<string>(type: "nvarchar(max)", nullable: true),
