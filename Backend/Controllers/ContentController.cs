@@ -2,6 +2,7 @@ using Backend.Data;
 using Backend.Dtos.Content;
 using Backend.Extensions;
 using Backend.Helpers;
+using Backend.Interfaces.IServices;
 using Backend.Mappers;
 using Backend.Models.Contents;
 using Microsoft.AspNetCore.Authorization;
@@ -17,10 +18,12 @@ namespace Backend.Controllers
     {
         ApplicationDbContext _context;
         FileUploadSettings _setting;
-        public ContentController(ApplicationDbContext context, IOptions<FileUploadSettings> options)
+        IFileService _fileService;
+        public ContentController(ApplicationDbContext context, IOptions<FileUploadSettings> options, IFileService fileService)
         {
             _context = context;
             _setting = options.Value;
+            _fileService = fileService;
         }
 
         [HttpPost("meta")]
@@ -40,6 +43,7 @@ namespace Backend.Controllers
 
             await _context.ContentMetas.AddAsync(newContent);
             await _context.SaveChangesAsync();
+            await _fileService.CreateContentDirectory(User.GetId(), newContent);
             return Ok(new { status = "success", message = "Content Meta created successfully" });
         }
         [HttpGet("meta")]
@@ -66,7 +70,7 @@ namespace Backend.Controllers
 
             if (content.File.Length > _setting.MaxFileSize)
                 return BadRequest("File size exceeds the maximum limits");
-
+            
             return Ok("Ok");
         }
     }

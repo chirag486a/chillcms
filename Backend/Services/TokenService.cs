@@ -37,6 +37,10 @@ namespace Backend.Services
             }
             var key = Encoding.ASCII.GetBytes(keyString);
 
+            if (user.Email == null)
+            {
+                throw new ArgumentException("Email is null");
+            }
             var Claims = new ClaimsIdentity(
                 [
                     new Claim(JwtRegisteredClaimNames.GivenName, user.Name),
