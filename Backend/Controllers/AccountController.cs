@@ -70,13 +70,13 @@ namespace Backend.Controllers
                     return Ok("Something went wrong");
                 }
                 await _fileService.CreateUserDirectoryAsync(NewUser);
-                
+
                 return Ok(NewUser);
             }
             catch (Exception err)
             {
                 Console.WriteLine(err);
-                return Ok("Something went wrong");
+                return Problem(err.Message);
             }
         }
 
