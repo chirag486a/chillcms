@@ -9,10 +9,10 @@ namespace Backend.Dtos.Content
     public class ContentFileCreateDto
     {
         [Required]
-        public required IFormFile File { get; set; }
+        public required List<IFormFile> Files { get; set; }
 
         [Required]
-        public int ContentId { get; set; }
+        public string ContentId { get; set; } = string.Empty;
 
         [Required]
         public string FileType { get; set; } = string.Empty;

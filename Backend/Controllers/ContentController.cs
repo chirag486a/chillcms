@@ -1,3 +1,4 @@
+using System.Drawing;
 using Backend.Data;
 using Backend.Dtos.Content;
 using Backend.Extensions;
@@ -56,22 +57,58 @@ namespace Backend.Controllers
         [Authorize]
         public async Task<IActionResult> UploadContentFile([FromForm] ContentFileCreateDto content)
         {
-            if (content.File == null || content.File.Length == 0)
+            try
             {
-                return BadRequest("File is required");
+                if (content.Files == null || content.Files.Count == 0)
+                {
+                    return BadRequest("File is required");
+                }
+                var contentMeta = await _context.ContentMetas.FirstOrDefaultAsync(cm => cm.Id == content.ContentId);
+                if (contentMeta is null)
+                {
+                    return BadRequest(new
+                    {
+                        status = "fail",
+                        message = "Create content meta data first"
+                    });
+                }
+                if (!_setting.AllowedFileTypes.TryGetValue(content.FileType, out var allowedExtension))
+                    return BadRequest("Invalid file format");
+                foreach (var file in content.Files)
+                {
+                    var fileExtension = Path.GetExtension(file.FileName).ToLower();
+
+                    if (!allowedExtension.Contains(fileExtension))
+                    {
+                        return BadRequest($"Content with type {fileExtension} is not allowed for format {content.FileType}.");
+                    }
+
+                    if (file.Length > _setting.MaxFileSize)
+                    {
+                        return BadRequest("File size exceeds the maximum limits");
+                    }
+                }
+
+                var UserId = User.GetId();
+                await _fileService.CreateFormatDirectory(UserId, content.ContentId, content.FileType);
+                int i = 0;
+                // Db call
+                foreach (Content c in content.ToContentIEnumerableFromContentFileCreateDto())
+                {
+                    await _context.Contents.AddAsync(c);
+                    await _context.SaveChangesAsync();
+                    // save file
+                    await _fileService.SaveContent(UserId, c, content.Files[i++]);
+
+                }
+
+                return Ok("Ok");
             }
-            Console.WriteLine(content.FileType);
-            if (!_setting.AllowedFileTypes.TryGetValue(content.FileType, out var allowedExtension))
-                return BadRequest("Invalid file format");
-            var fileExtension = Path.GetExtension(content.File.FileName).ToLower();
-
-            if (!allowedExtension.Contains(fileExtension))
-                return BadRequest($"File type {fileExtension} is not allowed for format {content.FileType}.");
-
-            if (content.File.Length > _setting.MaxFileSize)
-                return BadRequest("File size exceeds the maximum limits");
-            
-            return Ok("Ok");
+            catch (Exception err)
+            {
+                Console.WriteLine(err.Message);
+                return BadRequest(err);
+            }
         }
     }
 }

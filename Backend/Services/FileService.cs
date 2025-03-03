@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.Marshalling;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Backend.Interfaces.IServices;
 using Backend.Models.Contents;
 using Backend.Models.Users;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic;
 
 namespace Backend.Services
 {
@@ -62,7 +65,6 @@ namespace Backend.Services
 
                 if (!Directory.Exists(contentFolderPath))
                 {
-                    Console.WriteLine("hello");
                     await Task.Run(() => Directory.CreateDirectory(contentFolderPath));
                 }
             }
@@ -72,5 +74,52 @@ namespace Backend.Services
                 throw new Exception(err.Message);
             }
         }
+
+        public async Task CreateFormatDirectory(string userId, string contentId, string format)
+        {
+            try
+            {
+                var FormatPath = Path.Combine(_baseDirectory, userId, contentId, format);
+                if (!Directory.Exists(FormatPath))
+                {
+                    await Task.Run(() => Directory.CreateDirectory(FormatPath));
+                }
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine(err);
+                throw new Exception(err.Message);
+            }
+        }
+        public async Task SaveContent(string UserId, Content c, IFormFile file)
+        {
+            try
+            {
+                var saveDirectory = Path.Combine(_baseDirectory, UserId, c.ContentMetaId, c.Format);
+                var extension = Path.GetExtension(file.FileName);
+                var filePath = Path.Combine(saveDirectory, c.Id + extension);
+
+                Console.WriteLine("------------------");
+                Console.WriteLine("------------------");
+                Console.WriteLine(c.Id);
+                Console.WriteLine("------------------");
+                Console.WriteLine("------------------");
+                using (var stream = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                {
+                    await file.CopyToAsync(stream);
+                }
+            }
+            catch (UnauthorizedAccessException err)
+            {
+                Console.WriteLine(err);
+            }
+            catch (Exception err)
+            {
+                throw new Exception(err.Message);
+            }
+
+
+        }
+        // public async Task Store
     }
 }

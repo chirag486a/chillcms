@@ -82,6 +82,17 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IFileService, FileService>();
 
 
+var _baseDirectory = builder.Configuration.GetSection("FileStorageSettings")["Location"];
+if (string.IsNullOrWhiteSpace(_baseDirectory))
+{
+    throw new Exception("Could not find content storage location");
+}
+
+if (!Directory.Exists(_baseDirectory))
+{
+    await Task.Run(() => Directory.CreateDirectory(_baseDirectory));
+}
+
 var app = builder.Build();
 
 

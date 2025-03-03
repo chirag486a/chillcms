@@ -11,6 +11,8 @@ namespace Backend.Interfaces.IServices
     {
         public Task CreateUserDirectoryAsync(User user);
         public Task CreateContentDirectory(string userId, ContentMeta contentMeta);
+        public Task CreateFormatDirectory(string userId, string contentId, string format);
+        public Task SaveContent(string UserId, Content c, IFormFile file);
 
     }
 }

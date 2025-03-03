@@ -19,6 +19,7 @@ namespace Backend.Data
         }
 
         public DbSet<ContentMeta> ContentMetas { get; set; }
+        public DbSet<Content> Contents { get; set; }
 
     }
 }
