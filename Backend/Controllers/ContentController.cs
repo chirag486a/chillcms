@@ -53,6 +53,32 @@ namespace Backend.Controllers
             var contents = await _context.ContentMetas.ToListAsync();
             return Ok(contents);
         }
+        [HttpGet("meta/{id:guid}")]
+        public async Task<IActionResult> GetContentMeta([FromRoute] string id)
+        {
+            var contentsMeta = await _context.ContentMetas.Select(c => new
+            {
+                Id = c.Id,
+                UserId = c.UserId,
+                ContentTitle = c.ContentTitle,
+                ContentSlug = c.ContentSlug,
+                ContentDescription = c.ContentDescription,
+                CreatedAt = c.CreatedAt
+            }).FirstOrDefaultAsync(cm => cm.Id == id);
+            var contentQuery = _context.Contents.AsQueryable();
+            // contentQuery = contentQuery.Include(cm => cm.ContentMeta);
+            var contentData = await contentQuery.Where(cm => cm.ContentMetaId == id).Select(c => new
+            {
+                FileName = c.FileName,
+                Id = c.Id,
+                Format = c.Format
+            }).ToListAsync();
+            return Ok(new
+            {
+                contentsMeta,
+                contentData
+            });
+        }
         [HttpPost("file")]
         [Authorize]
         public async Task<IActionResult> UploadContentFile([FromForm] ContentFileCreateDto content)
