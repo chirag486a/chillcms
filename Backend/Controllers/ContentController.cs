@@ -136,5 +136,41 @@ namespace Backend.Controllers
                 return BadRequest(err);
             }
         }
+        [HttpGet("meta/{metaId:guid}/file/{fileId:guid}")]
+        public async Task<IActionResult> GetContentFile([FromRoute] string metaId, [FromRoute] string fileId)
+        {
+            try
+            {
+
+                if (string.IsNullOrWhiteSpace(metaId) || string.IsNullOrWhiteSpace(fileId))
+                {
+                    return BadRequest("Fuck just send file id or meta id");
+                }
+                var contentMeta = await _context.ContentMetas.FirstOrDefaultAsync(c => c.Id == metaId);
+                if (contentMeta == null)
+                {
+                    return BadRequest("Why ask the file that does not exits");
+                }
+                var content = await _context.Contents.FirstOrDefaultAsync(c => c.ContentMetaId == metaId && c.Id == fileId);
+                if (content == null)
+                {
+                    return BadRequest("Why ask the file that does not exits");
+                }
+
+                FileStream fileStream = _fileService.GetContent(contentMeta, content);
+
+
+                return new FileStreamResult(fileStream, "application/octet-stream")
+                {
+                    FileDownloadName = Path.GetFileName(content.FileName)
+                };
+
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine(err.Message);
+                return BadRequest("Something went wrong");
+            }
+        }
     }
 }

@@ -99,11 +99,6 @@ namespace Backend.Services
                 var extension = Path.GetExtension(file.FileName);
                 var filePath = Path.Combine(saveDirectory, c.Id + extension);
 
-                Console.WriteLine("------------------");
-                Console.WriteLine("------------------");
-                Console.WriteLine(c.Id);
-                Console.WriteLine("------------------");
-                Console.WriteLine("------------------");
                 using (var stream = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
                 {
                     await file.CopyToAsync(stream);
@@ -120,6 +115,10 @@ namespace Backend.Services
 
 
         }
-        // public async Task Store
+        public FileStream GetContent(ContentMeta cm, Content c)
+        {
+            var filePath = Path.Combine(_baseDirectory, cm.UserId, c.ContentMetaId, c.Format, c.Id + Path.GetExtension(c.FileName));
+            return new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        }
     }
 }

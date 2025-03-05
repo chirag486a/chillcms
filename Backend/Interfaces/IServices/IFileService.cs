@@ -13,6 +13,8 @@ namespace Backend.Interfaces.IServices
         public Task CreateContentDirectory(string userId, ContentMeta contentMeta);
         public Task CreateFormatDirectory(string userId, string contentId, string format);
         public Task SaveContent(string UserId, Content c, IFormFile file);
+        public FileStream GetContent(ContentMeta cm, Content c);
+
 
     }
 }
