@@ -20,6 +20,18 @@ namespace Backend.Mappers
                 ContentDescription = metaDto.ContentDescription
             };
         }
+        public static ContentMetaCreateResponseDto ToContentMetaCreateResponseFromContentMeta(this ContentMeta meta)
+        {
+            return new ContentMetaCreateResponseDto
+            {
+                Id = meta.Id,
+                UserId = meta.UserId,
+                CreatedAt = meta.CreatedAt,
+                ContentTitle = meta.ContentTitle,
+                ContentSlug = meta.ContentSlug,
+                ContentDescription = meta.ContentDescription
+            };
+        }
         public static IEnumerable<Content> ToContentIEnumerableFromContentFileCreateDto(this ContentFileCreateDto contentFileCreateDto)
         {
             foreach (var file in contentFileCreateDto.Files)

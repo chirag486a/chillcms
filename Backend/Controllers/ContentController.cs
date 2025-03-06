@@ -1,6 +1,7 @@
 using System.Drawing;
 using Backend.Data;
 using Backend.Dtos.Content;
+using Backend.Dtos.Response;
 using Backend.Extensions;
 using Backend.Helpers;
 using Backend.Interfaces.IServices;
@@ -45,7 +46,9 @@ namespace Backend.Controllers
             await _context.ContentMetas.AddAsync(newContent);
             await _context.SaveChangesAsync();
             await _fileService.CreateContentDirectory(User.GetId(), newContent);
-            return Ok(new { status = "success", message = "Content Meta created successfully" });
+            ContentMetaCreateResponseDto responseDto = newContent.ToContentMetaCreateResponseFromContentMeta();
+            // return Ok(new { status = "success", message = "Content Meta created successfully" });
+            return Ok(ApiResponse<ContentMetaCreateResponseDto>.Success(responseDto, "Content Meta created successfully"));
         }
         [HttpGet("meta")]
         public async Task<IActionResult> GetAllContentMeta()
