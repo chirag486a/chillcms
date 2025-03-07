@@ -47,14 +47,31 @@ namespace Backend.Controllers
             await _context.SaveChangesAsync();
             await _fileService.CreateContentDirectory(User.GetId(), newContent);
             ContentMetaCreateResponseDto responseDto = newContent.ToContentMetaCreateResponseFromContentMeta();
-            // return Ok(new { status = "success", message = "Content Meta created successfully" });
             return Ok(ApiResponse<ContentMetaCreateResponseDto>.Success(responseDto, "Content Meta created successfully"));
         }
         [HttpGet("meta")]
-        public async Task<IActionResult> GetAllContentMeta()
+        public async Task<IActionResult> GetAllContentMeta([FromQuery] GetAllContentMetaQueryDto queryDto)
         {
-            var contents = await _context.ContentMetas.ToListAsync();
-            return Ok(contents);
+
+            var contents = _context.ContentMetas.Include(c => c.User).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(queryDto.Id))
+            {
+                contents = contents.Where(c => c.Id == queryDto.Id);
+            }
+            if (!string.IsNullOrWhiteSpace(queryDto.Id))
+            {
+                contents = contents.Where(c => c.UserId == queryDto.UserId);
+            }
+            if (queryDto.IsDescending)
+            {
+                contents = contents.OrderByDescending(c => c.CreatedAt);
+            }
+            // ShortBy "createdAt"
+
+            var results = await contents.ToListAsync();
+
+            return Ok(results);
         }
         [HttpGet("meta/{id:guid}")]
         public async Task<IActionResult> GetContentMeta([FromRoute] string id)
