@@ -44,5 +44,26 @@ namespace Backend.Mappers
                 };
             }
         }
+        public static ContentMetaResponseDto ToContentMetaResponseDtoFromContentMeta(this ContentMeta meta)
+        {
+            return new ContentMetaResponseDto
+            {
+                Id = meta.Id,
+                UserId = meta.UserId,
+                CreatedAt = meta.CreatedAt,
+                ContentTitle = meta.ContentTitle ?? string.Empty,
+                ContentSlug = meta.ContentSlug ?? string.Empty,
+                ContentDescription = meta.ContentDescription ?? string.Empty
+            };
+        }
+        public static ContentFileInfoResponse ToContentFileInfoResponseDtoFromContentMeta(this Content content)
+        {
+            return new ContentFileInfoResponse
+            {
+                Id = content.Id,
+                FileName = content.FileName,
+                Format = content.Format
+            };
+        }
     }
 }

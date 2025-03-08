@@ -1,4 +1,6 @@
 using System.Drawing;
+using System.Net.Mime;
+using System.Xml.XPath;
 using Backend.Data;
 using Backend.Dtos.Content;
 using Backend.Dtos.Response;
@@ -53,51 +55,75 @@ namespace Backend.Controllers
         public async Task<IActionResult> GetAllContentMeta([FromQuery] GetAllContentMetaQueryDto queryDto)
         {
 
-            var contents = _context.ContentMetas.Include(c => c.User).AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(queryDto.Id))
+            try
             {
-                contents = contents.Where(c => c.Id == queryDto.Id);
-            }
-            if (!string.IsNullOrWhiteSpace(queryDto.Id))
-            {
-                contents = contents.Where(c => c.UserId == queryDto.UserId);
-            }
-            if (queryDto.IsDescending)
-            {
-                contents = contents.OrderByDescending(c => c.CreatedAt);
-            }
-            // ShortBy "createdAt"
 
-            var results = await contents.ToListAsync();
+                var contents = _context.ContentMetas.AsQueryable();
 
-            return Ok(results);
+                if (!string.IsNullOrWhiteSpace(queryDto.Id))
+                {
+                    contents = contents.Where(c => c.Id == queryDto.Id);
+                }
+                if (!string.IsNullOrWhiteSpace(queryDto.UserId))
+                {
+                    contents = contents.Where(c => c.UserId == queryDto.UserId);
+                }
+                if (queryDto.IsDescending)
+                {
+                    contents = contents.OrderByDescending(c => c.CreatedAt);
+                }
+                var results = await contents.ToListAsync();
+
+
+                return Ok(ApiResponse<List<ContentMeta>>.Success(results));
+            }
+            catch (Exception err)
+            {
+                return BadRequest(ApiResponse<ContentMeta>.Error(err.Message, null));
+            }
         }
         [HttpGet("meta/{id:guid}")]
         public async Task<IActionResult> GetContentMeta([FromRoute] string id)
         {
-            var contentsMeta = await _context.ContentMetas.Select(c => new
+            try
             {
-                Id = c.Id,
-                UserId = c.UserId,
-                ContentTitle = c.ContentTitle,
-                ContentSlug = c.ContentSlug,
-                ContentDescription = c.ContentDescription,
-                CreatedAt = c.CreatedAt
-            }).FirstOrDefaultAsync(cm => cm.Id == id);
-            var contentQuery = _context.Contents.AsQueryable();
-            // contentQuery = contentQuery.Include(cm => cm.ContentMeta);
-            var contentData = await contentQuery.Where(cm => cm.ContentMetaId == id).Select(c => new
+
+                var contentsMeta = await _context.ContentMetas.Select(c => new ContentMetaResponseDto
+                {
+                    Id = c.Id,
+                    ContentTitle = c.ContentTitle ?? string.Empty,
+                    ContentSlug = c.ContentSlug ?? string.Empty,
+                    ContentDescription = c.ContentDescription ?? string.Empty,
+                    CreatedAt = c.CreatedAt,
+                    UserId = c.UserId
+                }).FirstOrDefaultAsync(cm => cm.Id == id);
+
+                if (contentsMeta is null)
+                {
+                    return BadRequest(ApiResponse<GetContentMetaResponesDto>.Error("Content meta data could not be found"));
+                }
+
+                var contentQuery = _context.Contents.AsQueryable();
+
+                var contentData = await contentQuery.Where(cm => cm.ContentMetaId == id).Select(c => new ContentFileInfoResponse
+                {
+                    Id = c.Id,
+                    FileName = c.FileName,
+                    Format = c.Format
+                }).ToListAsync();
+
+                return Ok(ApiResponse<GetContentMetaResponesDto>.Success(new GetContentMetaResponesDto
+                {
+                    Meta = contentsMeta,
+                    Data = contentData
+                }));
+            }
+            catch (Exception err)
             {
-                FileName = c.FileName,
-                Id = c.Id,
-                Format = c.Format
-            }).ToListAsync();
-            return Ok(new
-            {
-                contentsMeta,
-                contentData
-            });
+                Console.WriteLine(err.Message);
+                Console.WriteLine(err.StackTrace);
+                return BadRequest(ApiResponse<object>.Error(err.Message));
+            }
         }
         [HttpPost("file")]
         [Authorize]
@@ -182,7 +208,7 @@ namespace Backend.Controllers
 
                 return new FileStreamResult(fileStream, "application/octet-stream")
                 {
-                    FileDownloadName = Path.GetFileName(content.FileName)
+                    FileDownloadName = Path.GetFileName(content.FileName),
                 };
 
             }
