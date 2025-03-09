@@ -6,6 +6,7 @@ using Backend.Dtos.Content;
 using Backend.Dtos.Response;
 using Backend.Extensions;
 using Backend.Helpers;
+using Backend.Interfaces.IRepository;
 using Backend.Interfaces.IServices;
 using Backend.Mappers;
 using Backend.Models.Contents;
@@ -23,11 +24,13 @@ namespace Backend.Controllers
         ApplicationDbContext _context;
         FileUploadSettings _setting;
         IFileService _fileService;
-        public ContentController(ApplicationDbContext context, IOptions<FileUploadSettings> options, IFileService fileService)
+        IContentMetaRepository _contentMetaRepository;
+        public ContentController(ApplicationDbContext context, IOptions<FileUploadSettings> options, IFileService fileService, IContentMetaRepository contentMetaRepository)
         {
             _context = context;
             _setting = options.Value;
             _fileService = fileService;
+            _contentMetaRepository = contentMetaRepository;
         }
 
         [HttpPost("meta")]
@@ -42,14 +45,11 @@ namespace Backend.Controllers
                     errors = ModelState
                 });
             }
-            ContentMeta newContent = content.ToContentMetaFromContentMetaCreateDto();
-            newContent.UserId = User.GetId();
-
-            await _context.ContentMetas.AddAsync(newContent);
-            await _context.SaveChangesAsync();
-            await _fileService.CreateContentDirectory(User.GetId(), newContent);
-            ContentMetaCreateResponseDto responseDto = newContent.ToContentMetaCreateResponseFromContentMeta();
-            return Ok(ApiResponse<ContentMetaCreateResponseDto>.Success(responseDto, "Content Meta created successfully"));
+            ContentMeta newContent = await _contentMetaRepository.CreateContentMeta(content, User.GetId());
+            return Ok(ApiResponse<ContentMetaCreateResponseDto>.Success(
+                    newContent.ToContentMetaCreateResponseFromContentMeta(),
+                    "Content Meta created successfully")
+                );
         }
         [HttpGet("meta")]
         public async Task<IActionResult> GetAllContentMeta([FromQuery] GetAllContentMetaQueryDto queryDto)
