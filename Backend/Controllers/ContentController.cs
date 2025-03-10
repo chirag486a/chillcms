@@ -12,6 +12,7 @@ using Backend.Mappers;
 using Backend.Models.Contents;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -33,90 +34,63 @@ namespace Backend.Controllers
             _contentMetaRepository = contentMetaRepository;
         }
 
-        [HttpPost("meta")]
+        [HttpPost]
         [Authorize]
         public async Task<IActionResult> CreateContentMeta([FromBody] ContentMetaCreateDto content)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(new
-                {
-                    status = "fail",
-                    errors = ModelState
-                });
+                ContentMeta newContent = await _contentMetaRepository.CreateContentMetaAsync(content, User.GetId());
+                return Ok(ApiResponse<ContentMetaCreateResponseDto>.Success(
+                        newContent.ToContentMetaCreateResponseFromContentMeta(),
+                        "Content Meta created successfully")
+                    );
             }
-            ContentMeta newContent = await _contentMetaRepository.CreateContentMeta(content, User.GetId());
-            return Ok(ApiResponse<ContentMetaCreateResponseDto>.Success(
-                    newContent.ToContentMetaCreateResponseFromContentMeta(),
-                    "Content Meta created successfully")
-                );
+            catch (Exception err)
+            {
+                Console.WriteLine(err.Message);
+                return BadRequest(ApiResponse<ContentMetaCreateResponseDto>.Error(err.Message));
+            }
         }
-        [HttpGet("meta")]
+        [HttpGet]
         public async Task<IActionResult> GetAllContentMeta([FromQuery] GetAllContentMetaQueryDto queryDto)
         {
 
             try
             {
-
-                var contents = _context.ContentMetas.AsQueryable();
-
-                if (!string.IsNullOrWhiteSpace(queryDto.Id))
-                {
-                    contents = contents.Where(c => c.Id == queryDto.Id);
-                }
-                if (!string.IsNullOrWhiteSpace(queryDto.UserId))
-                {
-                    contents = contents.Where(c => c.UserId == queryDto.UserId);
-                }
-                if (queryDto.IsDescending)
-                {
-                    contents = contents.OrderByDescending(c => c.CreatedAt);
-                }
-                var results = await contents.ToListAsync();
-
+                var results = await _contentMetaRepository.GetContentMetaAsync(queryDto);
 
                 return Ok(ApiResponse<List<ContentMeta>>.Success(results));
             }
             catch (Exception err)
             {
-                return BadRequest(ApiResponse<ContentMeta>.Error(err.Message, null));
+                return BadRequest(ApiResponse<ContentMeta>.Error(err.Message));
             }
         }
-        [HttpGet("meta/{id:guid}")]
-        public async Task<IActionResult> GetContentMeta([FromRoute] string id)
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetContentMetaById([FromRoute] string id)
         {
             try
             {
+                var results = await _contentMetaRepository.GetContentMetaByIdAsync(id);
 
-                var contentsMeta = await _context.ContentMetas.Select(c => new ContentMetaResponseDto
-                {
-                    Id = c.Id,
-                    ContentTitle = c.ContentTitle ?? string.Empty,
-                    ContentSlug = c.ContentSlug ?? string.Empty,
-                    ContentDescription = c.ContentDescription ?? string.Empty,
-                    CreatedAt = c.CreatedAt,
-                    UserId = c.UserId
-                }).FirstOrDefaultAsync(cm => cm.Id == id);
+                return Ok(ApiResponse<GetContentMetaResponesDto>.Success(results));
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine(err.Message);
+                Console.WriteLine(err.StackTrace);
+                return BadRequest(ApiResponse<object>.Error(err.Message));
+            }
+        }
+        [HttpGet("{slug}")]
+        public async Task<IActionResult> GetContentMetaBySlug([FromRoute] string slug)
+        {
+            try
+            {
+                var results = await _contentMetaRepository.GetContentMetaBySlugAsync(slug);
 
-                if (contentsMeta is null)
-                {
-                    return BadRequest(ApiResponse<GetContentMetaResponesDto>.Error("Content meta data could not be found"));
-                }
-
-                var contentQuery = _context.Contents.AsQueryable();
-
-                var contentData = await contentQuery.Where(cm => cm.ContentMetaId == id).Select(c => new ContentFileInfoResponse
-                {
-                    Id = c.Id,
-                    FileName = c.FileName,
-                    Format = c.Format
-                }).ToListAsync();
-
-                return Ok(ApiResponse<GetContentMetaResponesDto>.Success(new GetContentMetaResponesDto
-                {
-                    Meta = contentsMeta,
-                    Data = contentData
-                }));
+                return Ok(ApiResponse<GetContentMetaResponesDto>.Success(results));
             }
             catch (Exception err)
             {
@@ -182,7 +156,7 @@ namespace Backend.Controllers
                 return BadRequest(err);
             }
         }
-        [HttpGet("meta/{metaId:guid}/file/{fileId:guid}")]
+        [HttpGet("{metaId:guid}/file/{fileId:guid}")]
         public async Task<IActionResult> GetContentFile([FromRoute] string metaId, [FromRoute] string fileId)
         {
             try

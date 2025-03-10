@@ -9,6 +9,9 @@ namespace Backend.Interfaces.IRepository
 {
     public interface IContentMetaRepository
     {
-        public Task<ContentMeta> CreateContentMeta(ContentMetaCreateDto contentDto, string userId);
+        public Task<ContentMeta> CreateContentMetaAsync(ContentMetaCreateDto contentDto, string userId);
+        public Task<List<ContentMeta>> GetContentMetaAsync(GetAllContentMetaQueryDto queryDto);
+        public Task<GetContentMetaResponesDto> GetContentMetaByIdAsync(string contentMetaId);
+        public Task<GetContentMetaResponesDto> GetContentMetaBySlugAsync(string slug);
     }
 }

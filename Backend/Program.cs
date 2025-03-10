@@ -2,9 +2,12 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Backend.Data;
 using Backend.Helpers;
+using Backend.Interfaces.IRepository;
 using Backend.Interfaces.IServices;
 using Backend.Models;
+using Backend.Models.Contents;
 using Backend.Models.Users;
+using Backend.Repositories;
 using Backend.Services;
 using BCrypt.Net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -83,6 +86,7 @@ builder.Services.Configure<FileUploadSettings>(
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IContentMetaRepository, ContentMetaRepository>();
 
 
 var _baseDirectory = builder.Configuration.GetSection("FileStorageSettings")["Location"];
