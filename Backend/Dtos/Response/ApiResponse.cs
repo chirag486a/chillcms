@@ -10,7 +10,7 @@ namespace Backend.Dtos.Response
         public T? Data { get; set; }
         public string Message { get; set; }
         public bool Status { get; set; }
-        public List<string> Errors;
+        public List<string> Errors { get; set; }
 
         public ApiResponse()
         {
@@ -19,7 +19,7 @@ namespace Backend.Dtos.Response
             Message = "Hello World!";
         }
 
-        public static ApiResponse<T> Success(T data, string message = "Operation successfull")
+        public static ApiResponse<T> Success(T data, string message = "Operation successful")
         {
             return new ApiResponse<T>
             {
@@ -33,7 +33,7 @@ namespace Backend.Dtos.Response
             return new ApiResponse<T>
             {
                 Data = data,
-                Status = true,
+                Status = false,
                 Message = "Operation failed",
                 Errors = new List<string> { errorMessage }
             };
@@ -43,7 +43,7 @@ namespace Backend.Dtos.Response
             return new ApiResponse<T>
             {
                 Data = data,
-                Status = true,
+                Status = false,
                 Message = "Operation failed",
                 Errors = errors
             };

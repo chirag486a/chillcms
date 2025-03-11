@@ -31,9 +31,9 @@ builder.Services.AddIdentity<User, IdentityRole>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-    });
+{
+    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+});
 
 builder.Services.AddScoped<IPasswordHasher<User>, BCryptPasswordHasher>();
 
@@ -83,11 +83,9 @@ builder.Services.Configure<FileUploadSettings>(
     builder.Configuration.GetSection("FileUploadSettings")
 );
 
-
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IContentMetaRepository, ContentMetaRepository>();
-
 
 var _baseDirectory = builder.Configuration.GetSection("FileStorageSettings")["Location"];
 if (string.IsNullOrWhiteSpace(_baseDirectory))
@@ -101,7 +99,6 @@ if (!Directory.Exists(_baseDirectory))
 }
 
 var app = builder.Build();
-
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

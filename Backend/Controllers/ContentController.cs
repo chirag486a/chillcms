@@ -105,84 +105,29 @@ namespace Backend.Controllers
         {
             try
             {
-                if (content.Files == null || content.Files.Count == 0)
-                {
-                    return BadRequest("File is required");
-                }
-                var contentMeta = await _context.ContentMetas.FirstOrDefaultAsync(cm => cm.Id == content.ContentId);
-                if (contentMeta is null)
-                {
-                    return BadRequest(new
-                    {
-                        status = "fail",
-                        message = "Create content meta data first"
-                    });
-                }
-                if (!_setting.AllowedFileTypes.TryGetValue(content.FileType, out var allowedExtension))
-                    return BadRequest("Invalid file format");
-                foreach (var file in content.Files)
-                {
-                    var fileExtension = Path.GetExtension(file.FileName).ToLower();
-
-                    if (!allowedExtension.Contains(fileExtension))
-                    {
-                        return BadRequest($"Content with type {fileExtension} is not allowed for format {content.FileType}.");
-                    }
-
-                    if (file.Length > _setting.MaxFileSize)
-                    {
-                        return BadRequest("File size exceeds the maximum limits");
-                    }
-                }
-
-                var UserId = User.GetId();
-                await _fileService.CreateFormatDirectory(UserId, content.ContentId, content.FileType);
-                int i = 0;
-                // Db call
-                foreach (Content c in content.ToContentIEnumerableFromContentFileCreateDto())
-                {
-                    await _context.Contents.AddAsync(c);
-                    await _context.SaveChangesAsync();
-                    // save file
-                    await _fileService.SaveContent(UserId, c, content.Files[i++]);
-
-                }
-
-                return Ok("Ok");
+                await _contentMetaRepository.SaveContentFileAsync(content, User.GetId());
+                return Ok(ApiResponse<object?>.Success(null));
             }
             catch (Exception err)
             {
                 Console.WriteLine(err.Message);
-                return BadRequest(err);
+                var response = ApiResponse<object>.Error(err.Message);
+                Console.WriteLine(response.Errors[0]);
+                return BadRequest(response);
             }
         }
-        [HttpGet("{metaId:guid}/file/{fileId:guid}")]
+        [HttpGet("{metaId:guid}/{fileId:guid}")]
         public async Task<IActionResult> GetContentFile([FromRoute] string metaId, [FromRoute] string fileId)
         {
             try
             {
 
-                if (string.IsNullOrWhiteSpace(metaId) || string.IsNullOrWhiteSpace(fileId))
-                {
-                    return BadRequest("Fuck just send file id or meta id");
-                }
-                var contentMeta = await _context.ContentMetas.FirstOrDefaultAsync(c => c.Id == metaId);
-                if (contentMeta == null)
-                {
-                    return BadRequest("Why ask the file that does not exits");
-                }
-                var content = await _context.Contents.FirstOrDefaultAsync(c => c.ContentMetaId == metaId && c.Id == fileId);
-                if (content == null)
-                {
-                    return BadRequest("Why ask the file that does not exits");
-                }
-
-                FileStream fileStream = _fileService.GetContent(contentMeta, content);
+                var fileStream = await _contentMetaRepository.GetContentFile(metaId, fileId);
 
 
                 return new FileStreamResult(fileStream, "application/octet-stream")
                 {
-                    FileDownloadName = Path.GetFileName(content.FileName),
+                    FileDownloadName = Path.GetFileName(fileStream.Name),
                 };
 
             }
