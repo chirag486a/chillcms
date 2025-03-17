@@ -111,9 +111,8 @@ namespace Backend.Controllers
             catch (Exception err)
             {
                 Console.WriteLine(err.Message);
-                var response = ApiResponse<object>.Error(err.Message);
-                Console.WriteLine(response.Errors[0]);
-                return BadRequest(response);
+                return BadRequest(ApiResponse<object>.Error(err.Message));
+
             }
         }
         [HttpGet("{metaId:guid}/{fileId:guid}")]
@@ -122,19 +121,19 @@ namespace Backend.Controllers
             try
             {
 
+                var content = await _contentMetaRepository.GetContentDetailsAsync(metaId, fileId);
                 var fileStream = await _contentMetaRepository.GetContentFile(metaId, fileId);
 
 
-                return new FileStreamResult(fileStream, "application/octet-stream")
+                return new FileStreamResult(fileStream, MimeTypeConverter.GetMimeType(filePath: content.FileName))
                 {
-                    FileDownloadName = Path.GetFileName(fileStream.Name),
                 };
 
             }
             catch (Exception err)
             {
                 Console.WriteLine(err.Message);
-                return BadRequest("Something went wrong");
+                return BadRequest(ApiResponse<object>.Error(err.Message));
             }
         }
     }

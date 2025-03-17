@@ -1,4 +1,5 @@
 using System;
+using System.Web;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -32,7 +33,6 @@ namespace Backend.Repositories
         {
             try
             {
-
                 ContentMeta newContent = content.ToContentMetaFromContentMetaCreateDto();
                 newContent.UserId = userId;
                 var slugExits = await _context.ContentMetas.FirstOrDefaultAsync(c => c.ContentSlug == content.ContentSlug);
@@ -67,15 +67,33 @@ namespace Backend.Repositories
                 {
                     throw new Exception("Why ask the file that does not exits");
                 }
-                var content = await _context.Contents.FirstOrDefaultAsync(c => c.ContentMetaId == metaId && c.Id == fileId);
-                if (content == null)
-                {
-                    throw new Exception("Why ask the file that does not exits");
-                }
+                var content = await GetContentDetailsAsync(metaId, fileId);
 
                 FileStream fileStream = _fileService.GetContent(contentMeta, content);
 
                 return fileStream;
+            }
+            catch (Exception err)
+            {
+                throw new Exception(err.Message);
+            }
+        }
+
+        public async Task<Content> GetContentDetailsAsync(string metaId, string contentId)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(metaId) || string.IsNullOrWhiteSpace(contentId))
+                {
+                    throw new Exception("Fuck just send file id or meta id");
+                }
+                var content = await _context.Contents.FirstOrDefaultAsync(c => c.Id == contentId && c.ContentMetaId == metaId);
+
+                if (content == null)
+                {
+                    throw new Exception("Content not found");
+                }
+                return content;
             }
             catch (Exception err)
             {
@@ -200,6 +218,9 @@ namespace Backend.Repositories
                     throw new Exception("Invalid file format");
                 foreach (var file in content.Files)
                 {
+                    Console.WriteLine(file.ContentType);
+                    Console.WriteLine(file.Headers);
+                    Console.WriteLine(file.ContentDisposition);
                     var fileExtension = Path.GetExtension(file.FileName).ToLower();
 
                     if (!allowedExtension.Contains(fileExtension))

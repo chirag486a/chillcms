@@ -14,6 +14,8 @@ namespace Backend.Interfaces.IRepository
         public Task<GetContentMetaResponesDto> GetContentMetaByIdAsync(string contentMetaId);
         public Task<GetContentMetaResponesDto> GetContentMetaBySlugAsync(string slug);
         public Task SaveContentFileAsync(ContentFileCreateDto content, string userId);
+
+        public Task<Content> GetContentDetailsAsync(string metaId, string contentId);
         public Task<FileStream> GetContentFile(string metaId, string fileId);
 
     }
