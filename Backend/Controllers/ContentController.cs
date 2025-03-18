@@ -125,9 +125,8 @@ namespace Backend.Controllers
                 var fileStream = await _contentMetaRepository.GetContentFile(metaId, fileId);
 
 
-                return new FileStreamResult(fileStream, MimeTypeConverter.GetMimeType(filePath: content.FileName))
-                {
-                };
+                return new FileStreamResult(fileStream, MimeTypeConverter.GetMimeType(filePath: content.FileName));
+
 
             }
             catch (Exception err)

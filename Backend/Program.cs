@@ -87,6 +87,18 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IContentMetaRepository, ContentMetaRepository>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", builder =>
+    {
+        builder.WithOrigins("http://localhost:5173") // Your React app’s URL
+               .AllowAnyMethod()                     // Allow GET, POST, etc.
+               .AllowAnyHeader();                    // Allow any headers
+    });
+});
+
+
+
 var _baseDirectory = builder.Configuration.GetSection("FileStorageSettings")["Location"];
 if (string.IsNullOrWhiteSpace(_baseDirectory))
 {
@@ -103,6 +115,7 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("AllowReactApp");
 app.MapControllers();
 
 app.Run();
