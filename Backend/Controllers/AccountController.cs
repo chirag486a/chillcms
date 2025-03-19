@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Backend.Data;
+using Backend.Dtos.Response;
 using Backend.Dtos.User;
 using Backend.Extensions;
 using Backend.Interfaces.IServices;
@@ -93,25 +94,14 @@ namespace Backend.Controllers
 
                 if (loginUser == null)
                 {
-                    var errorResponse = new
-                    {
-                        status = "fail",
-                        message = "Could not find user"
-                    };
-                    return NotFound(errorResponse);
+                    return NotFound(ApiResponse<object>.Error("Login", "User not found"));
                 }
 
                 var results = await _signInManager.CheckPasswordSignInAsync(loginUser, loginDto.Password, false);
 
                 if (!results.Succeeded)
                 {
-                    var errorResponse = new
-                    {
-                        status = "fail",
-                        message = "Username not found or Incorrect Password"
-                    };
-
-                    return Unauthorized(errorResponse);
+                    return Unauthorized(ApiResponse<object>.Error("Login", "Username not found or Incorrect Password"));
                 }
 
                 var response = new
@@ -120,17 +110,12 @@ namespace Backend.Controllers
                     Email = loginUser.Email,
                     Token = _tokenService.GenerateToken(loginUser),
                 };
-                return Ok(response);
+                return Ok(ApiResponse<object>.Success(response));
             }
             catch (Exception err)
             {
                 Console.WriteLine(err);
-                var errResponse = new
-                {
-                    status = "fail",
-                    message = "Something went wrong"
-                };
-                return BadRequest(errResponse);
+                return BadRequest(ApiResponse<object>.Error("Server", "Something went wrong"));
             }
         }
 

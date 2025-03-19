@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Backend.Dtos.Response
 {
@@ -10,11 +12,11 @@ namespace Backend.Dtos.Response
         public T? Data { get; set; }
         public string Message { get; set; }
         public bool Status { get; set; }
-        public List<string> Errors { get; set; }
+        public Dictionary<string, string> Errors { get; set; }
 
         public ApiResponse()
         {
-            Errors = new List<string>();
+            Errors = new Dictionary<string, string>();
             Status = false;
             Message = "Hello World!";
         }
@@ -28,25 +30,19 @@ namespace Backend.Dtos.Response
                 Message = message
             };
         }
-        public static ApiResponse<T> Error(string errorMessage, T? data = default)
+
+        public static ApiResponse<T> Error(string Key, string Message, T? data = default)
         {
+            var errors = new Dictionary<string, string>();
+            errors.Add(Key, Message);
             return new ApiResponse<T>
             {
                 Data = data,
                 Status = false,
-                Message = "Operation failed",
-                Errors = new List<string> { errorMessage }
-            };
-        }
-        public static ApiResponse<T> Error(List<string> errors, T? data = default)
-        {
-            return new ApiResponse<T>
-            {
-                Data = data,
-                Status = false,
-                Message = "Operation failed",
+                Message = Message,
                 Errors = errors
             };
+
         }
     }
 }

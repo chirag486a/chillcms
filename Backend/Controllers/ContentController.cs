@@ -49,7 +49,7 @@ namespace Backend.Controllers
             catch (Exception err)
             {
                 Console.WriteLine(err.Message);
-                return BadRequest(ApiResponse<ContentMetaCreateResponseDto>.Error(err.Message));
+                return BadRequest(ApiResponse<ContentMetaCreateResponseDto>.Error("ContentMeta", err.Message));
             }
         }
         [HttpGet]
@@ -64,7 +64,7 @@ namespace Backend.Controllers
             }
             catch (Exception err)
             {
-                return BadRequest(ApiResponse<ContentMeta>.Error(err.Message));
+                return BadRequest(ApiResponse<ContentMeta>.Error("ContentMeta", err.Message));
             }
         }
         [HttpGet("{id:guid}")]
@@ -80,7 +80,7 @@ namespace Backend.Controllers
             {
                 Console.WriteLine(err.Message);
                 Console.WriteLine(err.StackTrace);
-                return BadRequest(ApiResponse<object>.Error(err.Message));
+                return BadRequest(ApiResponse<object>.Error("ContentMeta", err.Message));
             }
         }
         [HttpGet("{slug}")]
@@ -96,7 +96,7 @@ namespace Backend.Controllers
             {
                 Console.WriteLine(err.Message);
                 Console.WriteLine(err.StackTrace);
-                return BadRequest(ApiResponse<object>.Error(err.Message));
+                return BadRequest(ApiResponse<object>.Error("ContentMeta", err.Message));
             }
         }
         [HttpPost("file")]
@@ -111,7 +111,7 @@ namespace Backend.Controllers
             catch (Exception err)
             {
                 Console.WriteLine(err.Message);
-                return BadRequest(ApiResponse<object>.Error(err.Message));
+                return BadRequest(ApiResponse<object>.Error("ContentFile", err.Message));
 
             }
         }
@@ -132,7 +132,7 @@ namespace Backend.Controllers
             catch (Exception err)
             {
                 Console.WriteLine(err.Message);
-                return BadRequest(ApiResponse<object>.Error(err.Message));
+                return BadRequest(ApiResponse<object>.Error("ContentFile", err.Message));
             }
         }
     }
