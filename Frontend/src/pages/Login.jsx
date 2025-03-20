@@ -1,8 +1,38 @@
+import { useState, useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { AuthContext } from "../contexts/AuthContext";
+
 export default function Login() {
+  const { login, currentUser } = useContext(AuthContext);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState([]);
+  var navigate = useNavigate();
+  useEffect(() => {
+    if (currentUser) {
+      navigate("/dashboard");
+    }
+  });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const val = await login(email, password);
+    } catch (err) {
+      console.log(err);
+      setError('Failed to log in.');
+    }
+  };
+
   return (
     <div className="register h-full w-full flex items-center justify-center">
-      <form action="" className="shadow-2xl bg-primary-content py-16 px-24 rounded-xl">
+      <form
+        action=""
+        className="shadow-2xl bg-primary-content py-16 px-24 rounded-xl"
+        onSubmit={handleSubmit}
+      >
         <div className="prose">
+          <p className="text-red-500">something went wrong</p>
           <h2 className="text-center">Login</h2>
           <div className="form-control gap-4 w-80">
             <label className="form-control w-full max-w-xs">
@@ -13,6 +43,7 @@ export default function Login() {
                 type="text"
                 placeholder="John@gmail.com"
                 className="input input-bordered w-full max-w-xs"
+                onChange={(e) => setEmail(e.target.value)}
               />
             </label>
             <label htmlFor="" className="form-control w-full max-w-xs">
@@ -25,10 +56,16 @@ export default function Login() {
                 id=""
                 placeholder="Password"
                 className="input input-bordered w-full max-w-xs"
+                onChange={(e) => setPassword(e.target.value)}
               />
             </label>
             <div className="form-control gap-3 items-center justify-center my-4">
-              <button type="submit" className="btn btn-primary font-thin btn-base-100 w-full">Login</button>
+              <button
+                type="submit"
+                className="btn btn-primary font-thin btn-base-100 w-full"
+              >
+                Login
+              </button>
               <a>Create a new account</a>
             </div>
           </div>

@@ -12,7 +12,7 @@ const camalCaser = function (string) {
 };
 export default function NavItem({ children, to }) {
   const location = useLocation();
-  const className = ({ _, isPending }) => {
+  const className = ({ isPending }) => {
     const normalizePath = location.pathname.replace(/\/+$/, "");
     const isMatch = to === normalizePath;
     return isPending ? "pending  p-4" : isMatch ? "active p-4" : "p-4";

@@ -50,17 +50,7 @@ namespace Backend.Controllers
                 var ifExists = await _userManager.FindByEmailAsync(NewUser.Email);
                 if (ifExists != null)
                 {
-                    var errResponse = new
-                    {
-                        status = "fail",
-                        errors = new[] {
-                            new {
-                                code = "UserAlreadyExits",
-                                description = "Email with the user already exits"
-                            }
-                        }
-                    };
-                    return BadRequest(errResponse);
+                    return BadRequest(ApiResponse<object>.Error("Email", "Email with the user already exits"));
                 }
 
 
@@ -94,14 +84,14 @@ namespace Backend.Controllers
 
                 if (loginUser == null)
                 {
-                    return NotFound(ApiResponse<object>.Error("Login", "User not found"));
+                    return NotFound(ApiResponse<object>.Error("Email", "Email or password do not match"));
                 }
 
                 var results = await _signInManager.CheckPasswordSignInAsync(loginUser, loginDto.Password, false);
 
                 if (!results.Succeeded)
                 {
-                    return Unauthorized(ApiResponse<object>.Error("Login", "Username not found or Incorrect Password"));
+                    return Unauthorized(ApiResponse<object>.Error("Password", "Email or password do not match"));
                 }
 
                 var response = new
@@ -134,46 +124,31 @@ namespace Backend.Controllers
                 var user = await _userManager.FindByEmailAsync(email);
                 if (user == null)
                 {
-                    var errorResponse = new
-                    {
-                        status = "fail",
-                        errors = new
-                        {
-                            code = "UserNotFound",
-                            description = "User not found"
-                        }
-                    };
-                    return Unauthorized(errorResponse);
+                    return Unauthorized(ApiResponse<object>.Error("Email", "Email with the user not registered"));
                 }
 
 
                 var result = await _userManager.ChangePasswordAsync(user, passwordDto.OldPassword, passwordDto.NewPassword);
+                // IEnumerable<IdentityError> 'a.Errors { get; }
+
+
 
                 if (!result.Succeeded)
                 {
-                    var errorResponse = new
+                    var errorResponse = ApiResponse<object>.Error();
+                    foreach (var error in result.Errors)
                     {
-                        status = "fail",
-                        result.Errors
-                    };
+                        errorResponse.AddError(error.Code, error.Description);
+                    }
                     return Unauthorized(errorResponse);
                 }
 
-                var response = new
-                {
-                    status = "success",
-                    message = "Change Passworrd successfully",
-                };
-                return Ok(response);
+                return Ok(ApiResponse<object?>.Success(null, "Password changed successfully"));
             }
             catch (Exception err)
             {
                 Console.WriteLine(err);
-                return BadRequest(new
-                {
-                    status = "fail",
-                    message = "Something went wrong"
-                });
+                return BadRequest(ApiResponse<object>.Error("Server", "Something went wrong!"));
             }
         }
 

@@ -9,14 +9,14 @@ namespace Backend.Dtos.Response
 {
     public class ApiResponse<T>
     {
-        public T? Data { get; set; }
-        public string Message { get; set; }
-        public bool Status { get; set; }
-        public Dictionary<string, string> Errors { get; set; }
+        public T? Data { get; private set; }
+        public string Message { get; private set; }
+        public bool Status { get; private set; }
+        public Dictionary<string, List<string>>? Errors { get; private set; }
 
         public ApiResponse()
         {
-            Errors = new Dictionary<string, string>();
+            Errors = new Dictionary<string, List<string>>();
             Status = false;
             Message = "Hello World!";
         }
@@ -27,14 +27,26 @@ namespace Backend.Dtos.Response
             {
                 Data = data,
                 Status = true,
-                Message = message
+                Message = message,
+                Errors = null
             };
         }
+        public static ApiResponse<T> Error(string Message = "Operation failed!", T? data = default)
+        {
+            return new ApiResponse<T>
+            {
 
+                Data = data,
+                Status = false,
+                Message = Message,
+            };
+        }
         public static ApiResponse<T> Error(string Key, string Message, T? data = default)
         {
-            var errors = new Dictionary<string, string>();
-            errors.Add(Key, Message);
+            var errors = new Dictionary<string, List<string>>
+            {
+                { Key, [Message] }
+            };
             return new ApiResponse<T>
             {
                 Data = data,
@@ -42,7 +54,14 @@ namespace Backend.Dtos.Response
                 Message = Message,
                 Errors = errors
             };
-
+        }
+        public void AddError(string Key, string Message)
+        {
+            if (Errors == null)
+            {
+                return;
+            }
+            Errors[Key].Add(Message);
         }
     }
 }
