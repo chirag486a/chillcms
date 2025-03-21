@@ -1,5 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../contexts/ToastContext";
 
 import { AuthContext } from "../contexts/AuthContext";
 
@@ -7,7 +8,7 @@ export default function Login() {
   const { login, currentUser } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState([]);
+  const { addToast } = useToast();
   var navigate = useNavigate();
   useEffect(() => {
     if (currentUser) {
@@ -17,10 +18,12 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const val = await login(email, password);
+      await login(email, password);
     } catch (err) {
-      console.log(err);
-      setError('Failed to log in.');
+      if (!err.errors) addToast("Server: Something went wrong", "error", 3000);
+      for (const key in err.errors) {
+        addToast(`${key}: ${err.errors[key]}`, "error", 3000);
+      }
     }
   };
 
@@ -32,7 +35,6 @@ export default function Login() {
         onSubmit={handleSubmit}
       >
         <div className="prose">
-          <p className="text-red-500">something went wrong</p>
           <h2 className="text-center">Login</h2>
           <div className="form-control gap-4 w-80">
             <label className="form-control w-full max-w-xs">
