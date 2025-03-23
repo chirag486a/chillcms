@@ -8,7 +8,10 @@ export const ToastProvider = ({ children }) => {
 
   const addToast = (message, type = "info", duration = 3000) => {
     const id = Math.random().toString(36).substr(2, 9);
-    setToasts((prev) => [...prev, { id, message, type, duration }]);
+    setToasts((prev) => [
+      ...prev,
+      { id, message, type, duration, timestamp: Date.now() },
+    ]);
   };
 
   const removeToast = (id) => {
@@ -24,6 +27,7 @@ export const ToastProvider = ({ children }) => {
             key={toast.id}
             message={toast.message}
             type={toast.type}
+            timestamp={toast.timestamp}
             duration={toast.duration}
             onClose={() => removeToast(toast.id)}
           />
