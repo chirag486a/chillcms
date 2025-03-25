@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Backend.Data;
 using Backend.Dtos.Response;
@@ -38,10 +39,20 @@ namespace Backend.Controllers
         {
             try
             {
-
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ModelState);
+                    var errorResponse = ApiResponse<object>.Error();
+                    foreach (var modelState in ModelState)
+                    {
+                        string key = modelState.Key;
+                        var errors = modelState.Value.Errors;
+                        foreach (var error in errors)
+                        {
+                            string errorMessage = error.ErrorMessage;
+                            errorResponse.AddError(key, errorMessage);
+                        }
+                    }
+                    return BadRequest(errorResponse);
                 }
                 var NewUser = createUser.ToUserFromSignupDto();
 
@@ -55,10 +66,16 @@ namespace Backend.Controllers
 
 
                 var result = await _userManager.CreateAsync(NewUser, createUser.Password);
-
                 if (!result.Succeeded)
                 {
-                    return Ok("Something went wrong");
+                    var errorResponse = ApiResponse<object>.Error();
+                    foreach (IdentityError item in result.Errors)
+                    {
+                        Console.WriteLine(item.Code);
+                        Console.WriteLine(item.Description);
+                        errorResponse.AddError(item.Code, item.Description ?? "");
+                    }
+                    return BadRequest(errorResponse);
                 }
                 await _fileService.CreateUserDirectoryAsync(NewUser);
 
@@ -76,6 +93,21 @@ namespace Backend.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    var errorResponse = ApiResponse<object>.Error();
+                    foreach (var modelState in ModelState)
+                    {
+                        string key = modelState.Key;
+                        var errors = modelState.Value.Errors;
+                        foreach (var error in errors)
+                        {
+                            string errorMessage = error.ErrorMessage;
+                            errorResponse.AddError(key, errorMessage);
+                        }
+                    }
+                    return BadRequest(errorResponse);
+                }
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
                 User? loginUser = null;
@@ -116,8 +148,20 @@ namespace Backend.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ModelState);
+                    var errorResponse = ApiResponse<object>.Error();
+                    foreach (var modelState in ModelState)
+                    {
+                        string key = modelState.Key;
+                        var errors = modelState.Value.Errors;
+                        foreach (var error in errors)
+                        {
+                            string errorMessage = error.ErrorMessage;
+                            errorResponse.AddError(key, errorMessage);
+                        }
+                    }
+                    return BadRequest(errorResponse);
                 }
+
 
                 var email = passwordDto.Email;
 

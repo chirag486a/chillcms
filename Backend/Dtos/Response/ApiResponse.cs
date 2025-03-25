@@ -61,6 +61,11 @@ namespace Backend.Dtos.Response
             {
                 return;
             }
+            if (!Errors.ContainsKey(Key))
+            {
+                Errors[Key] = [Message];
+                return;
+            }
             Errors[Key].Add(Message);
         }
     }
