@@ -57,7 +57,7 @@ namespace Backend.Controllers
                 var NewUser = createUser.ToUserFromSignupDto();
 
                 // Done to remove editor warning...
-                if (NewUser.Email == null) return BadRequest("Email is invalid");
+                if (NewUser.Email == null) return BadRequest(ApiResponse<object>.Error("Email", "Email not found"));
                 var ifExists = await _userManager.FindByEmailAsync(NewUser.Email);
                 if (ifExists != null)
                 {

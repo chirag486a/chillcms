@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }) => {
       const { token } = response.data;
       localStorage.setItem("token", token);
       setCurrentUser({ token });
+      return response.data;
     } catch (err) {
       throw err.response.data;
     }

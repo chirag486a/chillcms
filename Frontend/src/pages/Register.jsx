@@ -1,36 +1,44 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useToast } from "../contexts/ToastContext";
+import { AuthContext } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 export default function Register() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const { addToast } = useToast();
-
+  const { login, currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (currentUser) {
+      navigate("/dashboard");
+      addToast("Already Logged in");
+    }
+  }, [currentUser, navigate, addToast]);
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      console.log(email);
-      console.log(name);
-      console.log(password);
-      console.log(username);
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:5235/api/accounts/register",
         { Email: email, Name: name, Password: password, UserName: username }
       );
-      console.log(response);
+      const loginResponse = await login(email, password);
+      addToast(`Welcome ${loginResponse.data.name}`, "success");
     } catch (err) {
-      const errResponse = err.response.data;
-      console.log(err)
+      const errResponse = err.response?.data;
+      if (!errResponse) {
+        addToast(`${err.message}`, "error");
+      }
+      console.log(err);
       for (let field in errResponse.errors) {
         errResponse.errors[field].forEach((value) => {
-          addToast(`${field}: ${value}`, "error");
+          addToast(value, "error");
         });
       }
     }
   };
-
   return (
     <div className="register h-full w-full flex items-center justify-center">
       <form

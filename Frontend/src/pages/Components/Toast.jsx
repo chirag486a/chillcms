@@ -27,7 +27,7 @@ const Toast = ({ message, type, duration, timestamp, onClose }) => {
 
   return (
     <div
-      className={`p-4 mb-2 rounded-md text-white shadow-lg animate-slide-in ${
+      className={`p-4 mb-2 rounded-md text-white shadow-lg animate-slide-in text-xs ${
         typeStyles[type] || "bg-gray-500"
       }`}
     >
