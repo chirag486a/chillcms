@@ -1,11 +1,10 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { ToastContext } from "../../contexts/ToastContext";
 import PropTypes from "prop-types";
 import Toast from "./Toast";
 
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
-  const hasAddedToast = useRef(false);
 
   const addToast = useCallback((message, type = "info", duration = 3000) => {
     const id = Math.random().toString(36).substr(2, 9);

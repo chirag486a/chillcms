@@ -13,8 +13,9 @@ export default function Login() {
   useEffect(() => {
     if (currentUser) {
       navigate("/dashboard");
+      addToast("Already Logged in.");
     }
-  });
+  }, [navigate, addToast, currentUser]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

@@ -19,7 +19,11 @@ export const AuthProvider = ({ children }) => {
         "http://localhost:5235/api/accounts/login",
         { Email: email, Password: password }
       );
-      const { token } = response.data;
+      const {
+        data: {
+          data: { token },
+        },
+      } = response;
       localStorage.setItem("token", token);
       setCurrentUser({ token });
       return response.data;
