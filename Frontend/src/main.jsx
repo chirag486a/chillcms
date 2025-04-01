@@ -4,13 +4,16 @@ import { AuthProvider } from "./providers/AuthProvider.jsx";
 import "./index.css";
 import App from "./App.jsx";
 import ToastProvider from "./pages/Components/ToastContainer.jsx";
+import { ApiProvider } from "./providers/ApiProvider.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
-      <ToastProvider>
-        <App />
-      </ToastProvider>
+      <ApiProvider>
+        <ToastProvider>
+          <App />
+        </ToastProvider>
+      </ApiProvider>
     </AuthProvider>
   </StrictMode>
 );
