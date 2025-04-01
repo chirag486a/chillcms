@@ -140,6 +140,12 @@ namespace Backend.Controllers
                 return BadRequest(ApiResponse<object>.Error("Server", "Something went wrong"));
             }
         }
+        [HttpGet]
+        [Authorize]
+        public IActionResult IsLoggedIn()
+        {
+            return Ok(ApiResponse<object?>.Success(null, "User is logged in"));
+        }
 
         [HttpPatch("changePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto passwordDto)
