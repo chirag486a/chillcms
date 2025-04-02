@@ -12,6 +12,8 @@ namespace Backend.Dtos.Content
         public string UserId { get; set; } = string.Empty;
         public bool IsDescending { get; set; } = true;
         public List<string> ShortBy { get; set; } = new List<string>();
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
         public bool IncludeFiles { get; set; }
     }
 }

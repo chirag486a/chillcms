@@ -34,7 +34,7 @@ namespace Backend.Controllers
             _contentMetaRepository = contentMetaRepository;
         }
 
-        [HttpPost]
+        [HttpPost("meta")]
         [Authorize]
         public async Task<IActionResult> CreateContentMeta([FromBody] ContentMetaCreateDto content)
         {

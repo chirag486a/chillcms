@@ -13,6 +13,6 @@ public class ContentMeta
   public string? ContentSlug { get; set; }
   public string? ContentDescription { get; set; }
   public bool ContentDeleted { get; set; }
-  public DateTime CreatedAt { get; set; }
+  public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
 }
