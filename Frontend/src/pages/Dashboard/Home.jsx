@@ -1,7 +1,10 @@
 import UsersIcon from "../../assets/icons/users.svg?react";
 import DiskOccupiedIcon from "../../assets/icons/disk-occupied.svg?react";
 import OnlineUserIcon from "../../assets/icons/online-user.svg?react";
-import RecentItem from "./Components/Home/RecentItem";
+import RecentPost from "./Components/Home/RecentPost";
+import RecentUser from "./Components/Home/RecentUser";
+import { ApiContext } from "../../contexts/ApiContext";
+import { useContext, useEffect, useState } from "react";
 
 export default function Home() {
   const users = [
@@ -26,6 +29,28 @@ export default function Home() {
       createdAt: new Date("2024-12-14T12:00:00Z"), // 6 days ago
     },
   ];
+  const [post, setPost] = useState(null);
+  const { getAllContentMeta } = useContext(ApiContext);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getAllContentMeta({
+          isDescending: true,
+          shortBy: ["CreatedAt"],
+          Page: 1,
+          PageSize: 5,
+        });
+        console.log(data.data);
+        if (!data.data) {
+          throw new Error("Data is undefined");
+        }
+        setPost([...data.data]);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchData();
+  }, [getAllContentMeta]);
 
   const posts = [
     {
@@ -85,17 +110,17 @@ export default function Home() {
             <div className="lg:w-1/3 w-1/2 md:w-1/2 xl:w-1/3">
               <h3>Recent Users</h3>
               <div className="flex  flex-col">
-                <RecentItem details={users[1]} />
-                <RecentItem details={users[2]} />
-                <RecentItem details={users[3]} />
+                <RecentUser details={users[1]} />
+                <RecentUser details={users[2]} />
+                <RecentUser details={users[3]} />
               </div>
             </div>
             <div className="lg:w-1/3 w-1/2 md:w-1/2 xl:w-1/3">
               <h3>Recent Posts</h3>
               <div className="flex  flex-col w-fit">
-                <RecentItem details={posts[0]} />
-                <RecentItem details={posts[1]} />
-                <RecentItem details={posts[2]} />
+                <RecentPost details={posts[0]} />
+                <RecentPost details={posts[1]} />
+                <RecentPost details={posts[2]} />
               </div>
             </div>
           </div>

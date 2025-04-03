@@ -2,9 +2,9 @@ import PropTypes from "prop-types";
 import { format } from "timeago.js";
 import RecentTitleName from "./RecentTitleName";
 
-export default function RecentItem({ details }) {
+export default function RecentUser({ details }) {
   return (
-    <button className="btn btn-ghost py-3 group h-fit w-full" >
+    <button className="btn btn-ghost py-3 group h-fit w-full">
       <div className="w-full flex justify-between items-center cursor-pointer gap-12">
         <div className="flex gap-2">
           <div
@@ -13,7 +13,9 @@ export default function RecentItem({ details }) {
           ></div>
           <div className="flex flex-col">
             <RecentTitleName>{details.name}</RecentTitleName>
-            <span id="active-time" className="text-xs font-thin w-fit">{format(details.createdAt)}</span>
+            <span id="active-time" className="text-xs font-thin w-fit">
+              {format(details.createdAt)}
+            </span>
           </div>
         </div>
         <div className="group-hover:opacity-100 opacity-0 transition-all duration-300">
@@ -25,7 +27,7 @@ export default function RecentItem({ details }) {
     </button>
   );
 }
-RecentItem.propTypes = {
+RecentUser.propTypes = {
   details: PropTypes.shape({
     name: PropTypes.string,
     createdAt: PropTypes.instanceOf(Date),

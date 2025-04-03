@@ -4,9 +4,40 @@ import { ApiContext } from "../contexts/ApiContext";
 import axios from "axios";
 
 export const ApiProvider = ({ children }) => {
-  async function getAllContentMeta() {
+  async function getAllContentMeta(options = {}) {
+    const {
+      id = "",
+      userId = "",
+      isDescending = true,
+      shortBy = ["createdAt"],
+      page = 1,
+      pageSize = 8,
+    } = {
+      id: "",
+      userId: "",
+      isDescending: true,
+      shortBy: ["createdAt"],
+      page: 1,
+      pageSize: 8,
+      ...options,
+    };
     try {
-      const response = await axios.get("http://localhost:5235/api/content");
+      let resource = `http://localhost:5235/api/content?`;
+      if (id != "") {
+        resource += `Id=${id}&`;
+      }
+      if (userId != "") {
+        resource += `UserId=${userId}&`;
+      }
+      resource += `IsDescending=${isDescending}&`;
+
+      shortBy.forEach((shortName) => {
+        resource += `ShortBy=${shortName}&`;
+      });
+      resource += `Page=${page}&PageSize=${pageSize}&`;
+      console.log(resource)
+
+      const response = await axios.get(resource);
       return response.data;
     } catch (err) {
       console.log(err);
