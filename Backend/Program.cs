@@ -95,6 +95,8 @@ builder.Services.Configure<FileUploadSettings>(
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IContentMetaRepository, ContentMetaRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 
 builder.Services.AddCors(options =>
 {
