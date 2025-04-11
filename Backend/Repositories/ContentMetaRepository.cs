@@ -118,52 +118,59 @@ namespace Backend.Repositories
                 {
                     contents = contents.Where(c => c.UserId == queryDto.UserId);
                 }
-                if (queryDto.ShortBy != null && queryDto.ShortBy.Count != 0)
-                {
-                    System.Reflection.PropertyInfo? property = null;
-                    foreach (var item in queryDto.ShortBy)
-                    {
-
-                        Console.WriteLine(item);
-                        property = typeof(ContentMeta).GetProperty(string.IsNullOrWhiteSpace(item) ? "CreatedAt" : item);
-                        if (property != null)
-                        {
-                            break;
-                        }
-                    }
-                    if (property != null)
-                    {
-                        var param = Expression.Parameter(typeof(ContentMeta), "c");
-                        var propertyAccess = Expression.Property(param, property);
-                        var conversion = Expression.Convert(propertyAccess, typeof(object));
-                        var orderByExp = Expression.Lambda<Func<ContentMeta, object>>(conversion, param);
-
-                        contents = queryDto.IsDescending ? contents.OrderByDescending(orderByExp) : contents.OrderBy(orderByExp);
-
-                        foreach (var sortField in queryDto.ShortBy.Skip(1))
-                        {
-                            property = typeof(ContentMeta).GetProperty(sortField);
-                            if (property == null) continue;
-
-                            propertyAccess = Expression.Property(param, property);
-                            conversion = Expression.Convert(propertyAccess, typeof(object));
-                            orderByExp = Expression.Lambda<Func<ContentMeta, object>>(conversion, param);
-
-                            contents = queryDto.IsDescending
-                                ? ((IOrderedQueryable<ContentMeta>)contents).ThenByDescending(orderByExp)
-                                : ((IOrderedQueryable<ContentMeta>)contents).ThenBy(orderByExp);
-                        }
-
-                    }
-                    else
-                    {
-                        contents = queryDto.IsDescending ? contents.OrderByDescending(c => c.CreatedAt) : contents.OrderBy(c => c.CreatedAt);
-                    }
-                }
-                Console.WriteLine("Page : " + queryDto.Page);
-                Console.WriteLine("PageSize : " + queryDto.PageSize);
                 contents = contents.Skip((queryDto.Page - 1) * queryDto.PageSize).Take(queryDto.PageSize);
-                var results = await contents.ToListAsync();
+
+
+                var sortField = queryDto.SortBy
+                    .Split(',')
+                    .Select(s => s.Trim())
+                    .Where(s => !string.IsNullOrEmpty(s))
+                    .ToArray();
+
+                System.Reflection.PropertyInfo? property = null;
+
+                var skip = 0;
+
+                foreach (var item in sortField)
+                {
+                    property = typeof(ContentMeta).GetProperty(string.IsNullOrWhiteSpace(item) ? "CreatedAt" : item);
+                    if (property != null) break;
+                }
+
+                List<ContentMeta> results;
+                if (property == null)
+                {
+                    contents = queryDto.IsDescending ? contents.OrderByDescending(c => c.CreatedAt) : contents.OrderBy(c => c.CreatedAt);
+                    results = await contents.ToListAsync();
+                    return results;
+                }
+
+
+
+                var param = Expression.Parameter(typeof(ContentMeta), "c");
+                var propertyAccess = Expression.Property(param, property);
+                var conversion = Expression.Convert(propertyAccess, typeof(object));
+
+                var orderByExp = Expression.Lambda<Func<ContentMeta, object>>(conversion, param);
+
+                contents = queryDto.IsDescending ? contents.OrderByDescending(orderByExp) : contents.OrderBy(orderByExp);
+
+
+                foreach (var field in sortField.Skip(skip))
+                {
+                    property = typeof(ContentMeta).GetProperty(field);
+                    if (property == null) continue;
+
+                    propertyAccess = Expression.Property(param, property);
+                    conversion = Expression.Convert(propertyAccess, typeof(object));
+                    orderByExp = Expression.Lambda<Func<ContentMeta, object>>(conversion, param);
+
+                    contents = queryDto.IsDescending
+                        ? ((IOrderedQueryable<ContentMeta>)contents).ThenByDescending(orderByExp)
+                        : ((IOrderedQueryable<ContentMeta>)contents).ThenBy(orderByExp);
+                }
+
+                results = await contents.ToListAsync();
                 return results;
             }
             catch (Exception err)

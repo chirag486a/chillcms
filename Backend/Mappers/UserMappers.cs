@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Backend.Dtos.Account;
 using Backend.Dtos.User;
 using Backend.Models;
 using Backend.Models.Users;
