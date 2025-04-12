@@ -9,7 +9,8 @@ namespace Backend.Dtos.Response
 {
     public class ApiResponse<T>
     {
-        public T? Data { get; private set; }
+        public dynamic? Data { get; private set; }
+        public int? Total { get; private set; }
         public string Message { get; private set; }
         public bool Status { get; private set; }
         public Dictionary<string, List<string>>? Errors { get; private set; }
@@ -28,6 +29,18 @@ namespace Backend.Dtos.Response
                 Data = data,
                 Status = true,
                 Message = message,
+                Errors = null,
+                Total = null
+            };
+        }
+        public static ApiResponse<T> Success(List<T> data, int total, string message = "Operation successfull")
+        {
+            return new ApiResponse<T>
+            {
+                Data = data,
+                Total = total,
+                Status = true,
+                Message = message,
                 Errors = null
             };
         }
@@ -35,7 +48,6 @@ namespace Backend.Dtos.Response
         {
             return new ApiResponse<T>
             {
-
                 Data = data,
                 Status = false,
                 Message = Message,
