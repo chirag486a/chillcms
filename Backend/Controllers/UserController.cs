@@ -28,9 +28,10 @@ namespace Backend.Controllers
 
             try
             {
+                
                 var users = await _userRepository.GetAllUsersAsync(queryDto);
 
-                return Ok(ApiResponse<List<User>>.Success(users));
+                return Ok(ApiResponse<List<dynamic>>.Success(users));
             }
             catch (Exception err)
             {

@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using Backend.Data;
 using Backend.Dtos.Response;
 using Backend.Dtos.User;
+using Backend.Extensions;
 using Backend.Interfaces.IRepository;
 using Backend.Models.Contents;
 using Backend.Models.Users;
@@ -21,7 +23,7 @@ namespace Backend.Repositories
         {
             _dbContenxt = dbContext;
         }
-        public async Task<List<User>> GetAllUsersAsync(GetAllUsersQueryDto queryDto)
+        public async Task<List<dynamic>> GetAllUsersAsync(GetAllUsersQueryDto queryDto)
         {
             try
             {
@@ -40,52 +42,11 @@ namespace Backend.Repositories
                 {
                     users = users.Where(u => u.UserName == queryDto.UserName);
                 }
-                var sortField = queryDto.SortBy
-                    .Split(',')
-                    .Select(s => s.Trim())
-                    .Where(s => !string.IsNullOrEmpty(s))
-                    .ToArray();
 
-                // and add orderBy or orderDescendingBy
-                System.Reflection.PropertyInfo? property = null;
-                var skip = 0;
-                foreach (var item in sortField)
-                {
-                    property = typeof(User).GetProperty(string.IsNullOrWhiteSpace(item) ? "CreatedAt" : item);
-                    skip++;
-                    if (property != null) break;
-                }
-                List<User> results;
-                if (property == null)
-                {
-                    users = queryDto.IsDescending ? users.OrderByDescending(u => u.CreatedAt) : users.OrderBy(u => u.CreatedAt);
+                users = users.SortField(queryDto.SortBy, queryDto.IsDescending, "CreatedAt");
 
-                    results = await users.ToListAsync();
-                    return results;
-                }
 
-                var param = Expression.Parameter(typeof(User), "u");
-                var propertyAccess = Expression.Property(param, property);
-                var conversion = Expression.Convert(propertyAccess, typeof(object));
-
-                var orderByExp = Expression.Lambda<Func<User, object>>(conversion, param);
-
-                users = queryDto.IsDescending ? users.OrderByDescending(orderByExp) : users.OrderBy(orderByExp);
-
-                foreach (var field in sortField.Skip(skip))
-                {
-                    property = typeof(User).GetProperty(field);
-                    if (property == null) continue;
-
-                    propertyAccess = Expression.Property(param, property);
-                    conversion = Expression.Convert(propertyAccess, typeof(object));
-
-                    orderByExp = Expression.Lambda<Func<User, object>>(conversion, param);
-
-                    users = queryDto.IsDescending ? ((IOrderedQueryable<User>)users).ThenByDescending(orderByExp) : ((IOrderedQueryable<User>)users).ThenBy(orderByExp);
-                }
-
-                results = await users.ToListAsync();
+                var results = await users.SelectDynamic(queryDto.Fields).SelectDynamicExcluding(queryDto.ExcludeFields).ToListAsync();
                 return results;
             }
             catch (Exception err)

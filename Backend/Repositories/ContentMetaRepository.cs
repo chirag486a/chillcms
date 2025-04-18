@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Linq.Expressions;
 using Microsoft.VisualBasic;
+using Backend.Extensions;
 
 namespace Backend.Repositories
 {
@@ -120,55 +121,59 @@ namespace Backend.Repositories
                 }
                 contents = contents.Skip((queryDto.Page - 1) * queryDto.PageSize).Take(queryDto.PageSize);
 
-
-                var sortField = queryDto.SortBy
-                    .Split(',')
-                    .Select(s => s.Trim())
-                    .Where(s => !string.IsNullOrEmpty(s))
-                    .ToArray();
-
-                System.Reflection.PropertyInfo? property = null;
-
-                var skip = 0;
-
-                foreach (var item in sortField)
-                {
-                    property = typeof(ContentMeta).GetProperty(string.IsNullOrWhiteSpace(item) ? "CreatedAt" : item);
-                    if (property != null) break;
-                }
-
                 List<ContentMeta> results;
-                if (property == null)
-                {
-                    contents = queryDto.IsDescending ? contents.OrderByDescending(c => c.CreatedAt) : contents.OrderBy(c => c.CreatedAt);
-                    results = await contents.ToListAsync();
-                    return results;
-                }
+
+                // var sortField = queryDto.SortBy
+                //     .Split(',')
+                //     .Select(s => s.Trim())
+                //     .Where(s => !string.IsNullOrEmpty(s))
+                //     .ToArray();
+
+                // System.Reflection.PropertyInfo? property = null;
+
+                // var skip = 0;
+
+                // foreach (var item in sortField)
+                // {
+                //     property = typeof(ContentMeta).GetProperty(string.IsNullOrWhiteSpace(item) ? "CreatedAt" : item);
+                //     if (property != null) break;
+                // }
+
+                // List<ContentMeta> results;
+                // if (property == null)
+                // {
+                //     contents = queryDto.IsDescending ? contents.OrderByDescending(c => c.CreatedAt) : contents.OrderBy(c => c.CreatedAt);
+                //     results = await contents.ToListAsync();
+                //     return results;
+                // }
 
 
 
-                var param = Expression.Parameter(typeof(ContentMeta), "c");
-                var propertyAccess = Expression.Property(param, property);
-                var conversion = Expression.Convert(propertyAccess, typeof(object));
+                // var param = Expression.Parameter(typeof(ContentMeta), "c");
+                // var propertyAccess = Expression.Property(param, property);
+                // var conversion = Expression.Convert(propertyAccess, typeof(object));
 
-                var orderByExp = Expression.Lambda<Func<ContentMeta, object>>(conversion, param);
+                // var orderByExp = Expression.Lambda<Func<ContentMeta, object>>(conversion, param);
 
-                contents = queryDto.IsDescending ? contents.OrderByDescending(orderByExp) : contents.OrderBy(orderByExp);
+                // contents = queryDto.IsDescending ? contents.OrderByDescending(orderByExp) : contents.OrderBy(orderByExp);
 
 
-                foreach (var field in sortField.Skip(skip))
-                {
-                    property = typeof(ContentMeta).GetProperty(field);
-                    if (property == null) continue;
+                // foreach (var field in sortField.Skip(skip))
+                // {
+                //     property = typeof(ContentMeta).GetProperty(field);
+                //     if (property == null) continue;
 
-                    propertyAccess = Expression.Property(param, property);
-                    conversion = Expression.Convert(propertyAccess, typeof(object));
-                    orderByExp = Expression.Lambda<Func<ContentMeta, object>>(conversion, param);
+                //     propertyAccess = Expression.Property(param, property);
+                //     conversion = Expression.Convert(propertyAccess, typeof(object));
+                //     orderByExp = Expression.Lambda<Func<ContentMeta, object>>(conversion, param);
 
-                    contents = queryDto.IsDescending
-                        ? ((IOrderedQueryable<ContentMeta>)contents).ThenByDescending(orderByExp)
-                        : ((IOrderedQueryable<ContentMeta>)contents).ThenBy(orderByExp);
-                }
+                //     contents = queryDto.IsDescending
+                //         ? ((IOrderedQueryable<ContentMeta>)contents).ThenByDescending(orderByExp)
+                //         : ((IOrderedQueryable<ContentMeta>)contents).ThenBy(orderByExp);
+                // }
+
+                contents = contents.SortField(queryDto.SortBy, queryDto.IsDescending, "CreatedAt");
+
 
                 results = await contents.ToListAsync();
                 return results;
