@@ -3,6 +3,7 @@ import { format } from "timeago.js";
 import RecentTitleName from "./RecentTitleName";
 
 export default function RecentPost({ details }) {
+
   return (
     <button className="btn btn-ghost py-3 group h-fit w-full">
       <div className="w-full flex justify-between items-center cursor-pointer gap-12">
@@ -12,9 +13,9 @@ export default function RecentPost({ details }) {
             className="h-10 w-10 aspect-square bg-base-content/80 rounded-sm"
           ></div>
           <div className="flex flex-col">
-            <RecentTitleName>{details.contentTitle}</RecentTitleName>
+            <RecentTitleName>{details.ContentTitle}</RecentTitleName>
             <span id="active-time" className="text-xs font-thin w-fit">
-              {format(details.createdAt)}
+              {format(details.CreatedAt)}
             </span>
           </div>
         </div>
@@ -29,7 +30,7 @@ export default function RecentPost({ details }) {
 }
 RecentPost.propTypes = {
   details: PropTypes.shape({
-    contentTitle: PropTypes.string,
-    createdAt: PropTypes.string,
+    ContentTitle: PropTypes.string,
+    CreatedAt: PropTypes.string,
   }),
 };
