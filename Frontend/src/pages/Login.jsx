@@ -5,17 +5,21 @@ import { useToast } from "../contexts/ToastContext";
 import { AuthContext } from "../contexts/AuthContext";
 
 export default function Login() {
-  const { login, currentUser } = useContext(AuthContext);
+  const { login, currentUser, isLoggedIn } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { addToast } = useToast();
   var navigate = useNavigate();
   useEffect(() => {
-    if (currentUser) {
-      navigate("/dashboard");
-      addToast("Already Logged in.");
+    async function checkLoggedIn() {
+      await isLoggedIn()
+      if (currentUser) {
+        navigate("/dashboard");
+        addToast("Already Logged in.");
+      }
     }
-  }, [navigate, addToast, currentUser]);
+    checkLoggedIn();
+  }, [navigate, currentUser, addToast, isLoggedIn]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

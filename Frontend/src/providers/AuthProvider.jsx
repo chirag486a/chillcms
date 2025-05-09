@@ -13,6 +13,8 @@ export const AuthProvider = ({ children }) => {
     }
     setLoading(false);
   }, []);
+  
+
   const login = async (email, password) => {
     try {
       const response = await axios.post(
@@ -31,6 +33,25 @@ export const AuthProvider = ({ children }) => {
       throw err.response.data;
     }
   };
+  const isLoggedIn = async () => {
+    try {
+      if (!currentUser?.token) {
+        return false;
+      }
+      await axios.get("http://localhost:5235/api/accounts/", {
+        headers: {
+          Authorization: `Bearer ${currentUser.token}`,
+        },
+      });
+      return true;
+    // eslint-disable-next-line no-unused-vars
+    } catch (err) {
+      
+      setCurrentUser(null);
+      localStorage.removeItem("token");
+      return false;
+    }
+  };
   const logout = () => {
     try {
       localStorage.removeItem("token");
@@ -39,7 +60,7 @@ export const AuthProvider = ({ children }) => {
       throw new Error(err);
     }
   };
-  const value = { currentUser, login, logout };
+  const value = { currentUser, login, logout, isLoggedIn };
   return (
     <AuthContext.Provider value={value}>
       {!loading && children}

@@ -12,6 +12,7 @@ export const ApiProvider = ({ children }) => {
       shortBy = ["createdAt"],
       page = 1,
       pageSize = 8,
+      fields = ""
     } = {
       id: "",
       userId: "",
@@ -19,8 +20,9 @@ export const ApiProvider = ({ children }) => {
       shortBy: ["createdAt"],
       page: 1,
       pageSize: 8,
+      fields: "",
       ...options,
-    };
+    }
     try {
       let resource = `http://localhost:5235/api/content?`;
       if (id != "") {
@@ -30,7 +32,9 @@ export const ApiProvider = ({ children }) => {
         resource += `UserId=${userId}&`;
       }
       resource += `IsDescending=${isDescending}&`;
-
+      if (fields != "") {
+        resource += `Fields=${fields}&`
+      }
       shortBy.forEach((shortName) => {
         resource += `ShortBy=${shortName}&`;
       });
@@ -38,6 +42,52 @@ export const ApiProvider = ({ children }) => {
       console.log(resource)
 
       const response = await axios.get(resource);
+      console.log(response.data.data)
+      return response.data;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
+  async function getAllUsers(options = {}) {
+    const {
+      id = "",
+      userId = "",
+      isDescending = true,
+      shortBy = ["createdAt"],
+      page = 1,
+      pageSize = 8,
+      fields = ""
+    } = {
+      id: "",
+      userId: "",
+      isDescending: true,
+      shortBy: ["createdAt"],
+      page: 1,
+      pageSize: 8,
+      fields: "",
+      ...options,
+    }
+    try {
+      let resource = `http://localhost:5235/api/users?`;
+      if (id != "") {
+        resource += `Id=${id}&`;
+      }
+      if (userId != "") {
+        resource += `UserId=${userId}&`;
+      }
+      resource += `IsDescending=${isDescending}&`;
+      if (fields != "") {
+        resource += `Fields=${fields}&`
+      }
+      shortBy.forEach((shortName) => {
+        resource += `ShortBy=${shortName}&`;
+      });
+      resource += `Page=${page}&PageSize=${pageSize}&`;
+
+      const response = await axios.get(resource);
+      console.log(response.data.data)
       return response.data;
     } catch (err) {
       console.log(err);
@@ -63,12 +113,13 @@ export const ApiProvider = ({ children }) => {
     }
   }
   // getAllContentMeta();
-  getContentById("0a0fdf1c-944f-4053-8689-565d3b40d572");
-  getAllContentMeta();
+  // getContentById("0a0fdf1c-944f-4053-8689-565d3b40d572");
+  // getAllContentMeta();
 
   const value = {
     getAllContentMeta,
     getContentById,
+    getAllUsers
   };
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
 };
