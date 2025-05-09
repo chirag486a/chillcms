@@ -7,6 +7,7 @@ import { ApiContext } from "../../contexts/ApiContext";
 import { useContext, useEffect, useState } from "react";
 
 export default function Home() {
+  const [loading, setLoading] = useState(true);
   const users = [
     {
       name: "Chirag Bimali",
@@ -29,7 +30,7 @@ export default function Home() {
       createdAt: new Date("2024-12-14T12:00:00Z"), // 6 days ago
     },
   ];
-  const [post, setPost] = useState(null);
+  const [posts, setPosts] = useState(null);
   const { getAllContentMeta } = useContext(ApiContext);
   useEffect(() => {
     const fetchData = async () => {
@@ -37,14 +38,15 @@ export default function Home() {
         const data = await getAllContentMeta({
           isDescending: true,
           shortBy: ["CreatedAt"],
-          Page: 1,
-          PageSize: 5,
+          page: 1,
+          pageSize: 3,
         });
         console.log(data.data);
         if (!data.data) {
           throw new Error("Data is undefined");
         }
-        setPost([...data.data]);
+        setPosts([...data.data]);
+        setLoading(false);
       } catch (err) {
         console.log(err);
       }
@@ -52,28 +54,28 @@ export default function Home() {
     fetchData();
   }, [getAllContentMeta]);
 
-  const posts = [
-    {
-      name: "Mastering Transform and Translate in Tailwind CSS",
-      createdAt: new Date("2024-12-10T12:00:00Z"),
-    },
-    {
-      name: "How to Use Tailwind CSS for Powerful Element Transitions",
-      createdAt: new Date("2024-12-09T11:55:00Z"), // 5 minutes ago
-    },
-    {
-      name: "Transform Your Designs with Tailwind CSS: A Complete Guide",
-      createdAt: new Date("2024-02-10T11:00:00Z"), // 1 hour ago
-    },
-    {
-      name: "Smooth Animations in Tailwind: Using Translate and Transition Effects",
-      createdAt: new Date("2024-12-19T12:00:00Z"), // 1 day ago
-    },
-    {
-      name: "Tailwind CSS Tricks: Moving Elements with Translate-X and Translate-Y",
-      createdAt: new Date("2024-12-14T12:00:00Z"), // 6 days ago
-    },
-  ];
+  // const posts = [
+  //   {
+  //     name: "Mastering Transform and Translate in Tailwind CSS",
+  //     createdAt: new Date("2024-12-10T12:00:00Z"),
+  //   },
+  //   {
+  //     name: "How to Use Tailwind CSS for Powerful Element Transitions",
+  //     createdAt: new Date("2024-12-09T11:55:00Z"), // 5 minutes ago
+  //   },
+  //   {
+  //     name: "Transform Your Designs with Tailwind CSS: A Complete Guide",
+  //     createdAt: new Date("2024-02-10T11:00:00Z"), // 1 hour ago
+  //   },
+  //   {
+  //     name: "Smooth Animations in Tailwind: Using Translate and Transition Effects",
+  //     createdAt: new Date("2024-12-19T12:00:00Z"), // 1 day ago
+  //   },
+  //   {
+  //     name: "Tailwind CSS Tricks: Moving Elements with Translate-X and Translate-Y",
+  //     createdAt: new Date("2024-12-14T12:00:00Z"), // 6 days ago
+  //   },
+  // ];
 
   return (
     <div>
@@ -118,9 +120,10 @@ export default function Home() {
             <div className="lg:w-1/3 w-1/2 md:w-1/2 xl:w-1/3">
               <h3>Recent Posts</h3>
               <div className="flex  flex-col w-fit">
-                <RecentPost details={posts[0]} />
-                <RecentPost details={posts[1]} />
-                <RecentPost details={posts[2]} />
+                {!loading && console.log(posts)}
+                {!loading && posts.map((post) => {
+                  return <RecentPost key={post.id} details={post} />;
+                })}
               </div>
             </div>
           </div>

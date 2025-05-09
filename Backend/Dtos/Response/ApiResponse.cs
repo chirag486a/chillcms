@@ -33,6 +33,18 @@ namespace Backend.Dtos.Response
                 Total = null
             };
         }
+
+        public static ApiResponse<T> Success(T data, int total, string message = "Operation successful")
+        {
+            return new ApiResponse<T>
+            {
+                Data = data,
+                Status = true,
+                Message = message,
+                Errors = null,
+                Total = total
+            };
+        }
         public static ApiResponse<T> Success(List<T> data, int total, string message = "Operation successfull")
         {
             return new ApiResponse<T>

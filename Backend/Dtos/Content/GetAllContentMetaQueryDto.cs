@@ -14,6 +14,8 @@ namespace Backend.Dtos.Content
         public string SortBy { get; set; } = string.Empty;
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;
+        public string Fields { get; set; } = string.Empty; 
+        public string ExcludeFields { get; set; } = string.Empty; 
         public bool IncludeFiles { get; set; }
     }
 }

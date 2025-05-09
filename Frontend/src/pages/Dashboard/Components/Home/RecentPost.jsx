@@ -12,7 +12,7 @@ export default function RecentPost({ details }) {
             className="h-10 w-10 aspect-square bg-base-content/80 rounded-sm"
           ></div>
           <div className="flex flex-col">
-            <RecentTitleName>{details.name}</RecentTitleName>
+            <RecentTitleName>{details.contentTitle}</RecentTitleName>
             <span id="active-time" className="text-xs font-thin w-fit">
               {format(details.createdAt)}
             </span>
@@ -29,7 +29,7 @@ export default function RecentPost({ details }) {
 }
 RecentPost.propTypes = {
   details: PropTypes.shape({
-    name: PropTypes.string,
-    createdAt: PropTypes.instanceOf(Date),
+    contentTitle: PropTypes.string,
+    createdAt: PropTypes.string,
   }),
 };

@@ -10,7 +10,7 @@ namespace Backend.Interfaces.IRepository
     public interface IContentMetaRepository
     {
         public Task<ContentMeta> CreateContentMetaAsync(ContentMetaCreateDto contentDto, string userId);
-        public Task<List<ContentMeta>> GetContentMetaAsync(GetAllContentMetaQueryDto queryDto);
+        public Task<(List<Dictionary<string, object>> Data, int Total)>  GetContentMetaAsync(GetAllContentMetaQueryDto queryDto);
         public Task<GetContentMetaResponesDto> GetContentMetaByIdAsync(string contentMetaId);
         public Task<GetContentMetaResponesDto> GetContentMetaBySlugAsync(string slug);
         public Task SaveContentFileAsync(ContentFileCreateDto content, string userId);

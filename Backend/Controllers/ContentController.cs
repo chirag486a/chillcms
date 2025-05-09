@@ -60,7 +60,7 @@ namespace Backend.Controllers
             {
                 var results = await _contentMetaRepository.GetContentMetaAsync(queryDto);
 
-                return Ok(ApiResponse<List<ContentMeta>>.Success(results));
+                return Ok(ApiResponse<List<Dictionary<string, object>>>.Success(results.Data, results.Total));
             }
             catch (Exception err)
             {

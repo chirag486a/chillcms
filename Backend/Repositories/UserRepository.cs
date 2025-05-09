@@ -18,18 +18,18 @@ namespace Backend.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly ApplicationDbContext _dbContenxt;
+        private readonly ApplicationDbContext _dbContext;
         public UserRepository(ApplicationDbContext dbContext)
         {
-            _dbContenxt = dbContext;
+            _dbContext = dbContext;
         }
-        public async Task<List<dynamic>> GetAllUsersAsync(GetAllUsersQueryDto queryDto)
+        public async Task<(List<Dictionary<string, object>> data, int total)> GetAllUsersAsync(GetAllUsersQueryDto queryDto)
         {
             try
             {
+                queryDto.ExcludeFields = string.Join(",", queryDto.ExcludeFields, "PasswordHash");
 
-                IQueryable<User> users = _dbContenxt.Users.AsQueryable();
-                users = users.Skip((queryDto.Page - 1) * queryDto.PageSize).Take(queryDto.PageSize);
+                IQueryable<User> users = _dbContext.Users.AsQueryable();
                 if (!string.IsNullOrWhiteSpace(queryDto.Id))
                 {
                     users = users.Where(u => u.Id == queryDto.Id);
@@ -45,9 +45,24 @@ namespace Backend.Repositories
 
                 users = users.SortField(queryDto.SortBy, queryDto.IsDescending, "CreatedAt");
 
+                IQueryable<Dictionary<string, object>> data;
+                int count = await users.CountAsync();
+                users = users.Skip((queryDto.Page - 1) * queryDto.PageSize).Take(queryDto.PageSize);
 
-                var results = await users.SelectDynamic(queryDto.Fields).SelectDynamicExcluding(queryDto.ExcludeFields).ToListAsync();
-                return results;
+                if (!string.IsNullOrEmpty(queryDto.Fields))
+                {
+                    data = users.SelectDynamic(queryDto.Fields);
+
+                    return (await data.Select(u => u.ToDictionary()).ToListAsync(), count);
+                }
+                if (!string.IsNullOrEmpty(queryDto.ExcludeFields))
+                {
+                    data = users.SelectDynamicExcluding(queryDto.ExcludeFields);
+                    return (await data.Select(u => u.ToDictionary()).ToListAsync(), count);
+                }
+
+
+                return (await users.Select(u => u.ToDictionary()).ToListAsync(), count);
             }
             catch (Exception err)
             {

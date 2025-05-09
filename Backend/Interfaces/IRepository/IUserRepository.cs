@@ -9,6 +9,6 @@ namespace Backend.Interfaces.IRepository
 {
     public interface IUserRepository
     {
-        public Task<List<dynamic>> GetAllUsersAsync(GetAllUsersQueryDto queryDto);
+        public Task<(List<Dictionary<string, object>> data, int total)> GetAllUsersAsync(GetAllUsersQueryDto queryDto);
     }
 }

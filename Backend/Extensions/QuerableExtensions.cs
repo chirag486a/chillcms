@@ -16,18 +16,19 @@ namespace Backend.Extensions
 {
     public static class QuerableExtensions
     {
-        public static IQueryable<dynamic> SelectDynamic<TEntity>(this IQueryable<TEntity> query, string fields) where TEntity : class
+        public static IQueryable<Dictionary<string, object>> SelectDynamic<TEntity>(this IQueryable<TEntity> query, string fields) where TEntity : class
         {
 
-            if (string.IsNullOrWhiteSpace(fields) || string.IsNullOrEmpty(fields))
+            if (string.IsNullOrEmpty(fields) || string.IsNullOrWhiteSpace(fields))
             {
-                return query;
+                throw new ArgumentException($"Include fields is empty", nameof(fields));
             }
 
             var fieldNames = fields.Split(',')
                           .Select(f => f.Trim())
-                          .Where(f => !string.IsNullOrWhiteSpace(f))
+                          .Where(f => !string.IsNullOrWhiteSpace(f) && !string.Equals(f, "PasswordHash"))
                           .ToList();
+
 
             var (isValid, invalidFields) = ValidateFields.Validate<TEntity>(fieldNames);
 
@@ -61,36 +62,42 @@ namespace Backend.Extensions
 
             return query.Select(selector);
         }
-    //     public static IQueryable<dynamic> SelectDynamicExcluding<TEntity>(
-    // this IQueryable<TEntity> query, string excludeFields) where TEntity : class
-    //     {
-    //         var excluded = excludeFields.Split(',')
-    //                                      .Select(f => f.Trim())
-    //                                      .Where(f => !string.IsNullOrWhiteSpace(f))
-    //                                      .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        public static IQueryable<Dictionary<string, object>> SelectDynamicExcluding<TEntity>(
+    this IQueryable<TEntity> query, string excludeFields) where TEntity : class
+        {
+            Console.WriteLine(excludeFields);
+            if (string.IsNullOrEmpty(excludeFields) || string.IsNullOrWhiteSpace(excludeFields))
+            {
+                throw new ArgumentException($"Exclude fields is empty", nameof(excludeFields));
+            }
+            excludeFields += ",PasswordHash";
+            var excluded = excludeFields.Split(',')
+                                         .Select(f => f.Trim())
+                                         .Where(f => !string.IsNullOrWhiteSpace(f))
+                                         .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-    //         var entityType = typeof(TEntity);
-    //         var properties = entityType
-    //             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-    //             .Where(p => !excluded.Contains(p.Name))
-    //             .ToList();
+            var entityType = typeof(TEntity);
+            var properties = entityType
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => !excluded.Contains(p.Name))
+                .ToList();
 
-    //         var parameter = Expression.Parameter(entityType, "e");
-    //         var addMethod = typeof(Dictionary<string, object>).GetMethod("Add");
+            var parameter = Expression.Parameter(entityType, "e");
+            var addMethod = typeof(Dictionary<string, object>).GetMethod("Add");
 
-    //         var newDict = Expression.ListInit(
-    //             Expression.New(typeof(Dictionary<string, object>)),
-    //             properties.Select(prop =>
-    //             {
-    //                 var propAccess = Expression.Property(parameter, prop);
-    //                 var boxed = Expression.Convert(propAccess, typeof(object));
-    //                 return Expression.ElementInit(addMethod!, Expression.Constant(prop.Name), boxed);
-    //             })
-    //         );
+            var newDict = Expression.ListInit(
+                Expression.New(typeof(Dictionary<string, object>)),
+                properties.Select(prop =>
+                {
+                    var propAccess = Expression.Property(parameter, prop);
+                    var boxed = Expression.Convert(propAccess, typeof(object));
+                    return Expression.ElementInit(addMethod!, Expression.Constant(prop.Name), boxed);
+                })
+            );
 
-    //         var selector = Expression.Lambda<Func<TEntity, Dictionary<string, object>>>(newDict, parameter);
-    //         return query.Select(selector);
-    //     }
+            var selector = Expression.Lambda<Func<TEntity, Dictionary<string, object>>>(newDict, parameter);
+            return query.Select(selector);
+        }
 
 
         public static IQueryable<TEntity> SortField<TEntity>(this IQueryable<TEntity> query, string fields, bool IsDescending = false, string defaultField = "CreatedAt") where TEntity : class
