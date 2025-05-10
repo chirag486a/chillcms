@@ -5,6 +5,9 @@ import RecentPost from "./Components/Home/RecentPost";
 import RecentUser from "./Components/Home/RecentUser";
 import { ApiContext } from "../../contexts/ApiContext";
 import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "../../contexts/ToastContext";
 
 export default function Home() {
   const [loadingPosts, setLoadingPosts] = useState(true);
@@ -31,6 +34,11 @@ export default function Home() {
   //     createdAt: new Date("2024-12-14T12:00:00Z"), // 6 days ago
   //   },
   // ];
+
+  const { currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const { addToast } = useToast();
+
   const [posts, setPosts] = useState(null);
   const [users, setUsers] = useState(null);
   const { getAllContentMeta, getAllUsers } = useContext(ApiContext);
@@ -61,7 +69,7 @@ export default function Home() {
           shortBy: ["CreatedAt"],
           page: 1,
           pageSize: 3,
-          fields: "CreatedAt,ContentTitle,Id",
+          fields: "CreatedAt,Name,Id",
         });
         if (!data.data) {
           throw new Error("Data is undefined");
@@ -69,13 +77,17 @@ export default function Home() {
         setPosts([...data.data]);
         setLoadingUsers(false);
       } catch (err) {
-        console.log(err);
+        if (!currentUser) {
+          navigate("/login");
+          addToast("Login to get access");
+        }
+        console.error(err);
       }
     };
 
     fetchPostsData();
     fetchUsersData();
-  }, [getAllContentMeta, getAllUsers]);
+  }, [getAllContentMeta, getAllUsers, addToast, currentUser, navigate]);
 
   // const posts = [
   //   {

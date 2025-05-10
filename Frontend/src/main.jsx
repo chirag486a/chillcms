@@ -8,12 +8,12 @@ import { ApiProvider } from "./providers/ApiProvider.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <AuthProvider>
-      <ApiProvider>
-        <ToastProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <ApiProvider>
           <App />
-        </ToastProvider>
-      </ApiProvider>
-    </AuthProvider>
+        </ApiProvider>
+      </AuthProvider>
+    </ToastProvider>
   </StrictMode>
 );

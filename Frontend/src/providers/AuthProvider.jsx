@@ -1,19 +1,39 @@
 import { useState, useEffect } from "react";
+import { useToast } from "../contexts/ToastContext";
 import axios from "axios";
 import { AuthContext } from "../contexts/AuthContext";
+
 import PropTypes from "prop-types";
 
 export const AuthProvider = ({ children }) => {
+  let { addToast } = useToast();
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      setCurrentUser({ token });
+    async function checkLoggedIn() {
+      try {
+        await axios.get("http://localhost:5235/api/accounts/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setLoading(false);
+        setCurrentUser({ token });
+      } catch (err) {
+        console.log(err);
+        localStorage.removeItem("token");
+        setCurrentUser(null);
+        setLoading(false);
+        throw err;
+      }
     }
-    setLoading(false);
-  }, []);
-  
+    if (token) {
+      checkLoggedIn();
+    } else {
+      setLoading(false);
+    }
+  }, [addToast]);
 
   const login = async (email, password) => {
     try {
@@ -44,9 +64,8 @@ export const AuthProvider = ({ children }) => {
         },
       });
       return true;
-    // eslint-disable-next-line no-unused-vars
+      // eslint-disable-next-line no-unused-vars
     } catch (err) {
-      
       setCurrentUser(null);
       localStorage.removeItem("token");
       return false;

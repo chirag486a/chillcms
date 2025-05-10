@@ -1,9 +1,14 @@
 import PropTypes from "prop-types";
 import { ApiContext } from "../contexts/ApiContext";
+import { useContext } from "react";
 
 import axios from "axios";
 
+import { AuthContext } from "../contexts/AuthContext";
+
 export const ApiProvider = ({ children }) => {
+  const { currentUser } = useContext(AuthContext);
+
   async function getAllContentMeta(options = {}) {
     const {
       id = "",
@@ -12,7 +17,7 @@ export const ApiProvider = ({ children }) => {
       shortBy = ["createdAt"],
       page = 1,
       pageSize = 8,
-      fields = ""
+      fields = "",
     } = {
       id: "",
       userId: "",
@@ -22,7 +27,7 @@ export const ApiProvider = ({ children }) => {
       pageSize: 8,
       fields: "",
       ...options,
-    }
+    };
     try {
       let resource = `http://localhost:5235/api/content?`;
       if (id != "") {
@@ -33,19 +38,17 @@ export const ApiProvider = ({ children }) => {
       }
       resource += `IsDescending=${isDescending}&`;
       if (fields != "") {
-        resource += `Fields=${fields}&`
+        resource += `Fields=${fields}&`;
       }
       shortBy.forEach((shortName) => {
         resource += `ShortBy=${shortName}&`;
       });
       resource += `Page=${page}&PageSize=${pageSize}&`;
-      console.log(resource)
 
       const response = await axios.get(resource);
-      console.log(response.data.data)
       return response.data;
     } catch (err) {
-      console.log(err);
+      err;
       throw err;
     }
   }
@@ -58,7 +61,7 @@ export const ApiProvider = ({ children }) => {
       shortBy = ["createdAt"],
       page = 1,
       pageSize = 8,
-      fields = ""
+      fields = "",
     } = {
       id: "",
       userId: "",
@@ -68,7 +71,7 @@ export const ApiProvider = ({ children }) => {
       pageSize: 8,
       fields: "",
       ...options,
-    }
+    };
     try {
       let resource = `http://localhost:5235/api/users?`;
       if (id != "") {
@@ -79,19 +82,26 @@ export const ApiProvider = ({ children }) => {
       }
       resource += `IsDescending=${isDescending}&`;
       if (fields != "") {
-        resource += `Fields=${fields}&`
+        resource += `Fields=${fields}&`;
       }
       shortBy.forEach((shortName) => {
         resource += `ShortBy=${shortName}&`;
       });
       resource += `Page=${page}&PageSize=${pageSize}&`;
 
-      const response = await axios.get(resource);
-      console.log(response.data.data)
+      if (!currentUser?.token) {
+        throw new Error("Login to get access");
+      }
+
+      const response = await axios.get(resource, {
+        headers: {
+          Authorization: `Bearer ${currentUser.token}`,
+        },
+      });
+      console.log(response.data.data);
       return response.data;
     } catch (err) {
-      console.log(err);
-      throw err;
+      throw new Error(err);
     }
   }
   async function getContentById(id) {
@@ -119,7 +129,7 @@ export const ApiProvider = ({ children }) => {
   const value = {
     getAllContentMeta,
     getContentById,
-    getAllUsers
+    getAllUsers,
   };
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
 };
