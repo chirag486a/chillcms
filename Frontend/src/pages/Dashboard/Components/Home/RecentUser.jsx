@@ -12,9 +12,9 @@ export default function RecentUser({ details }) {
             className="h-10 w-10 aspect-square bg-base-content/80 rounded-sm"
           ></div>
           <div className="flex flex-col">
-            <RecentTitleName>{details.name}</RecentTitleName>
+            <RecentTitleName>{details.Name}</RecentTitleName>
             <span id="active-time" className="text-xs font-thin w-fit">
-              {format(details.createdAt)}
+              {format(details.CreatedAt)}
             </span>
           </div>
         </div>
@@ -29,7 +29,7 @@ export default function RecentUser({ details }) {
 }
 RecentUser.propTypes = {
   details: PropTypes.shape({
-    name: PropTypes.string,
-    createdAt: PropTypes.instanceOf(Date),
+    Name: PropTypes.string,
+    CreatedAt: PropTypes.instanceOf(Date),
   }),
 };

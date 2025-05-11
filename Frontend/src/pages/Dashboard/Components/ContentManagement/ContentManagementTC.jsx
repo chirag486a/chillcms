@@ -13,12 +13,12 @@ export default function ContentManagementTC({ content }) {
           </div>
           <div className="text-left max-w-96 min-w-96 overflow-ellipsis overflow-hidden">
             <span className="text-nowrap max-w-96 overflow-ellipsis">
-              {content.title}
+              {content.ContentTitle}
             </span>
           </div>
         </div>
-        <div className="w-40 text-center">{format(content.createdAt)}</div>
-        <div className="w-20 text-right">{content.status}</div>
+        <div className="w-40 text-center">{format(content.CreatedAt)}</div>
+        <div className="w-20 text-right">{content.Status}</div>
       </div>
     </button>
   );
@@ -26,8 +26,8 @@ export default function ContentManagementTC({ content }) {
 
 ContentManagementTC.propTypes = {
   content: PropTypes.shape({
-    title: PropTypes.string,
-    createdAt: PropTypes.any,
-    status: PropTypes.string,
+    ContentTitle: PropTypes.string,
+    CreatedAt: PropTypes.any,
+    Status: PropTypes.string,
   }),
 };

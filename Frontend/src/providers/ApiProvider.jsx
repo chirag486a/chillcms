@@ -98,7 +98,6 @@ export const ApiProvider = ({ children }) => {
           Authorization: `Bearer ${currentUser.token}`,
         },
       });
-      console.log(response.data.data);
       return response.data;
     } catch (err) {
       throw new Error(err);

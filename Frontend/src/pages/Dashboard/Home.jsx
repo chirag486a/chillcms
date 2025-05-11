@@ -74,7 +74,7 @@ export default function Home() {
         if (!data.data) {
           throw new Error("Data is undefined");
         }
-        setPosts([...data.data]);
+        setUsers([...data.data]);
         setLoadingUsers(false);
       } catch (err) {
         if (!currentUser) {
@@ -151,9 +151,9 @@ export default function Home() {
                 <RecentUser details={users[2]} />
                 <RecentUser details={users[3]} /> */}
 
-                {!loadingPosts &&
-                  posts.map((post) => {
-                    return <RecentUser key={post.Id} details={post} />;
+                {!loadingUsers &&
+                  users.map((user) => {
+                    return <RecentUser key={user.Id} details={user} />;
                   })}
               </div>
             </div>
