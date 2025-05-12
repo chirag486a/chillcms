@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { format } from "timeago.js";
 
 export default function UserManagementTC({ content }) {
-  console.log(content.createdAt);
   return (
     <>
       <button className="btn btn-ghost border-base-300 border-0 pl-0 pr-4  rounded-none inline-block h-fit w-full  font-thin even:bg-base-200 even:btn-ghost">
@@ -15,20 +14,22 @@ export default function UserManagementTC({ content }) {
             <div className="text-left flex gap-4 items-center w-40">
               <div className="h-8 aspect-square bg-base-300 rounded-sm">
                 <img
-                  src={content.imgsrc}
-                  alt={content.name + " photo"}
+                  // src={content.Imgsrc}
+                  src="https://picsum.photos/200"
+                  alt={content.Name + " photo"}
                   className="h-full m-0"
                 />
               </div>
               <span className="text-nowrap w-full max-w-96 overflow-ellipsis">
-                {content.name}
+                {content.Name}
               </span>
             </div>
           </div>
-          <div className="w-40 text-center">{format(content.createdAt)}</div>
-          <div className="w-20 text-center">{content.role}</div>
-          <div className="w-40 text-center">{content.username}</div>
-          <div className="w-60 text-center">{content.email}</div>
+          <div className="w-40 text-center">{format(content.CreatedAt)}</div>
+          {/* <div className="w-20 text-center">{content.Role}</div> */}
+          <div className="w-20 text-center">Admin</div>
+          <div className="w-40 text-center">{content.UserName}</div>
+          <div className="w-60 text-center">{content.Email}</div>
         </div>
       </button>
     </>
@@ -37,11 +38,11 @@ export default function UserManagementTC({ content }) {
 
 UserManagementTC.propTypes = {
   content: PropTypes.shape({
-    username: PropTypes.string,
-    createdAt: PropTypes.any,
-    role: PropTypes.string,
-    name: PropTypes.string,
-    email: PropTypes.string,
-    imgsrc: PropTypes.string,
+    UserName: PropTypes.string,
+    CreatedAt: PropTypes.any,
+    Role: PropTypes.string,
+    Name: PropTypes.string,
+    Email: PropTypes.string,
+    Imgsrc: PropTypes.string,
   }),
 };

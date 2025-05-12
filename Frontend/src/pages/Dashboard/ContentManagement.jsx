@@ -1,13 +1,12 @@
 import ContentManagementTC from "./Components/ContentManagement/ContentManagementTC";
 import Checkbox from "@mui/material/Checkbox";
-import { ChevronLeft, Pages } from "@mui/icons-material";
+import { ChevronLeft } from "@mui/icons-material";
 import { ChevronRight } from "@mui/icons-material";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { useContext, useEffect, useState } from "react";
 import { ApiContext } from "../../contexts/ApiContext";
-import { data } from "react-router-dom";
 
 function SearchToolBar() {
   return (
@@ -95,31 +94,6 @@ export default function ContentManagement() {
     }
     loadContents();
   }, [getAllContentMeta, page]);
-  // const contents = [
-  //   {
-  //     title: "Road to hail ",
-  //     createdAt: new Date() - 100000000000,
-  //     status: "Pending",
-  //   },
-  //   {
-  //     title: "All is well!",
-  //     createdAt: Date.now() - 1000000,
-  //     status: "Uploaded",
-  //   },
-  //   {
-  //     title: "Shree antu ko love story",
-  //     createdAt: Date.now() - 123100900000,
-  //     status: "Uploaded",
-  //   },
-  //   {
-  //     title:
-  //       "PolySoundex is a multi-language Soundex library for .NET that enables phonetic searching and indexing across various languages. Easily configure Soundex mappings for different scripts, including English and Nepali, to enhance search functionality. Perfect for applications requiring robust name matching in multilingual environments.",
-  //     createdAt: new Date() - 100000000000,
-  //     status: "Pending",
-  //   },
-  // ];
-  console.log(page * pageSize, totals);
-  console.log(contents);
   return (
     !loading && (
       <>
