@@ -129,4 +129,15 @@ app.UseAuthorization();
 app.UseCors("AllowReactApp");
 app.MapControllers();
 
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await DbSeeder.SeedRolesAsync(services);
+    await DbSeeder.SeedAdminUserAsync(services);
+
+}
+
+
+
 app.Run();
