@@ -65,6 +65,8 @@ builder.Services.AddAuthentication(options =>
     // options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     // options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 
+
+
     options.DefaultAuthenticateScheme =
     options.DefaultChallengeScheme =
     options.DefaultForbidScheme =
@@ -84,6 +86,10 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
+});
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
 });
 
 

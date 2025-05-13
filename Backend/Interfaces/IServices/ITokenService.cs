@@ -9,6 +9,6 @@ namespace Backend.Interfaces.IServices
 {
     public interface ITokenService
     {
-        public string GenerateToken(User user);
+        public Task<string> GenerateTokenAsync(User user);
     }
 }

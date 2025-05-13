@@ -35,7 +35,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost("meta")]
-        [Authorize]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> CreateContentMeta([FromBody] ContentMetaCreateDto content)
         {
             try

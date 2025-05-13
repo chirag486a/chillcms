@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Backend.Data;
 using Backend.Dtos.Account;
@@ -121,17 +123,22 @@ namespace Backend.Controllers
                 }
 
                 var results = await _signInManager.CheckPasswordSignInAsync(loginUser, loginDto.Password, false);
+                
 
                 if (!results.Succeeded)
                 {
                     return Unauthorized(ApiResponse<object>.Error("Password", "Email or password do not match"));
                 }
 
+
+                var role = await _userManager.GetRolesAsync(loginUser);
+
                 var response = new
                 {
                     Name = loginUser.Name,
                     Email = loginUser.Email,
-                    Token = _tokenService.GenerateToken(loginUser),
+                    Role = role,
+                    Token = await _tokenService.GenerateTokenAsync(loginUser),
                 };
                 return Ok(ApiResponse<object>.Success(response));
             }
